@@ -4,16 +4,14 @@ const bodyParser = require('body-parser')
 const compression = require('compression')
 const cors = require('cors')
 const helmet = require('helmet')
+const { PORT } = require('../config/config');
 
 // Import routes
-const booksRouter = require('./routes/books-route')
-
-// Set default port for express app
-const PORT = process.env.PORT || 4001
+const topicsRoutes = require('./routes/topicRoutes')
 
 // Create express app
 const app = express()
-
+ 
 // Apply middleware
 // Note: Keep this at the top, above routes
 app.use(cors())
@@ -23,7 +21,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
 // Implement books route
-app.use('/books', booksRouter)
+app.use('/topicks', topicsRoutes)
 
 // Implement 500 error route
 app.use(function (err, req, res, next) {

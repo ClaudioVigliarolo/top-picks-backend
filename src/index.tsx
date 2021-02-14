@@ -1,15 +1,46 @@
 // Import deps
-import React from 'react'
-import { render } from 'react-dom'
+import React from "react";
+import { render } from "react-dom";
+import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 
 // Import components
-import { Bookshelf } from './components/bookshelf'
+import ReportsPage from "./screens/ReportsPage";
+import InsertCategoriesPage from "./screens/InsertCategoriesPage";
+import InsertQuestionsPage from "./screens/InsertQuestionsPage";
+import InsertTopicsPage from "./screens/InsertTopicsPage";
+
+import MainPage from "./screens/InsertPage";
 
 // Import styles
-import './styles/styles.css'
+import "./styles/styles.css";
+import StartPage from "./screens/StartPage";
 
 // Find div container
-const rootElement = document.getElementById('root')
+const rootElement = document.getElementById("root");
 
-// Render Bookshelf component in the DOM
-render(<Bookshelf />, rootElement)
+render(
+  <Router>
+    <Switch>
+      <Route exact path="/">
+        <StartPage />
+      </Route>
+      <Route exact path="/insert">
+        <MainPage />
+      </Route>
+      <Route path="/reports">
+        <ReportsPage />
+      </Route>
+      <Route path="/insert/categories/:lang">
+        <InsertCategoriesPage />
+      </Route>
+      <Route path="/insert/topics/:lang">
+        <InsertTopicsPage />
+      </Route>
+      <Route path="/insert/questions/:lang">
+        <InsertQuestionsPage />
+      </Route>
+    </Switch>
+  </Router>,
+
+  rootElement
+);
