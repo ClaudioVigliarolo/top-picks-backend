@@ -20,6 +20,15 @@ app.use(compression())
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
+
+app.use(express.static(path.join(__dirname, 'build')));
+
+
+app.get('/*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
+
+
 // Implement books route
 app.use('/topicks', topicsRoutes)
 
@@ -38,3 +47,5 @@ app.use(function (req, res, next) {
 app.listen(PORT, function() {
   console.log(`Server is running on: ${PORT}`)
 })
+
+
