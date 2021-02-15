@@ -1,6 +1,7 @@
 // Import dependencies
 const express = require('express')
 const bodyParser = require('body-parser')
+const history = require('express-history-api-fallback');
 const compression = require('compression')
 const cors = require('cors')
 const path = require('path');
@@ -11,7 +12,6 @@ const { PORT } = require('../config/config');
 // Import routes
 const topicsRoutes = require('./routes/topicRoutes')
 
-app.use(compression());
 
 // Create express app
 const app = express()
