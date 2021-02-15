@@ -11,6 +11,8 @@ const { PORT } = require('../config/config');
 // Import routes
 const topicsRoutes = require('./routes/topicRoutes')
 
+app.use(compression());
+
 // Create express app
 const app = express()
  
@@ -22,14 +24,11 @@ app.use(compression())
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
+
+
 app.use(morgan('dev'));
-
-
-app.use(express.static(path.join(__dirname, 'public')));
-
-app.get('*', function(req, res) {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
+app.use(express.static(__dirname + '/public'));
+app.use(express.static(path.join(__dirname, '..', 'client', 'build')));
 
 
 // Implement books route
@@ -45,6 +44,9 @@ app.use(function (err, req, res, next) {
 app.use(function (req, res, next) {
   res.status(404).send('Sorry we could not find that.')
 })
+
+app.use(history(path.join(__dirname, '..', 'client', 'build', 'index.html')));
+
 
 // Start express app
 app.listen(PORT, function() {
