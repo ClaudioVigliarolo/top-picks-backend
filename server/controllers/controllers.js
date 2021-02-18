@@ -1,35 +1,24 @@
-// Import database
-const knex = require('../db')
+const {getDate, getHash} = require ("../functions/functions");
 
-// Retrieve all topics
-exports.categoryAdd = async (req, res) => {
+
+const knex = require('../db')
+exports.categoryAdd = (req, res) => {
   knex('categories'+ req.body.lang) 
-  .insert({title:req.body.category}) // select all records
+  .insert({title:req.body.category}) 
   .then(() => {
-    // Send books extracted from database in response
     res.status(200)
     res.json()
   })
   .catch(err => {
-    // Send a error message in response
     console.log(err)
     res.status(500)
     res.json({ message: `There was an error retrieving data: ${err}` })
   })
 }
 
-function getHash(str) {
-  var hash = 0, i, chr;
-  for (i = 0; i < str.length; i++) {
-    chr   = str.charCodeAt(i);
-    hash  = ((hash << 5) - hash) + chr;
-    hash |= 0; // Convert to 32bit integer
-  }
-  return hash;
-}
 
 
-async function addQuestion  (question, topic, lang)  {
+async function addQuestion (question, topic, lang)  {
   {
      try {
         await knex('questions'+ lang) 
@@ -51,30 +40,22 @@ exports.questionsAdd = async (req, res) => {
         }).catch(err=>{
         res.status(500)
         res.send()
-
         });
 }
- 
 
 
 exports.topicAdd = async (req, res) => {
-  console.log("ttrrrrrrrr",req.body.categories)
-  console.log("lan",req.body.lang)
-  console.log("top",req.body.topic)
   try{
-    //1: add topic to topicsLANG table
     knex('topics'+ req.body.lang) 
-    .insert({title:req.body.topic, source: "TopPicks Creators" })// select all records
+    .insert({title:req.body.topic, source: "TopPicks Creators" })
     .then(()=>{
-      //2: foeach categ: add a tuple category, topic in the category_topics table
       req.body.categories.forEach(async categ =>{
      await knex('category_topics'+ req.body.lang) 
-      .insert({topic:req.body.topic, category: categ }) // select all records
+      .insert({topic:req.body.topic, category: categ }) 
     });
       res.status(200)
       res.json()
-    }).catch((err)=>console.log(err),
-    res.status(500))
+    })
   }catch(err)
   {
     console.log(err),
@@ -83,39 +64,96 @@ exports.topicAdd = async (req, res) => {
 }
 
 
-// Retrieve all categories
-exports.categoriesAll = async (req, res) => {
-  // Get all books from database
+exports.categoriesAll = (req, res) => {
   knex 
-  .select('title') // select all records
-  .from('categories'+req.params.lang) // from 'books' table
-  .then(userData => {
-    // Send books extracted from database in response
-    console.log(userData)
-    res.json(userData)
+  .select('title')
+  .from('categories'+req.params.lang) 
+  .then(data => {
+    console.log(data)
+    res.json(data)
   })
   .catch(err => {
-    // Send a error message in response
     res.json({ message: `There was an error retrieving data: ${err}` })
   })
 }
 
 
-// Retrieve all categories
-exports.topicsAll = async (req, res) => {
-  // Get all books from database
+exports.topicsAll = (req, res) => {
   knex 
-  .select('title') // select all records
-  .from('topics'+req.params.lang) // from 'books' table
-  .then(userData => {
-    // Send books extracted from database in response
-    console.log("topics",userData)
-    res.json(userData)
+  .select('title') 
+  .from('topics'+req.params.lang) 
+  .then(data => {
+    console.log("topics",data)
+    res.json(data)
   })
   .catch(err => {
-    // Send a error message in response
     res.json({ message: `There was an error retrieving data: ${err}` })
   })
 }
 
 
+
+
+
+exports.getUpdates= (req, res) => {
+  const lang = req.params.lang;
+  const lastClientUpdate = req.params.date;
+  const lastServerUpdate = req.params.lang;
+
+  const JSONresponse={
+    
+    categories:[],
+    topics:[],
+    category_topics:[],
+    related:[],
+
+
+  };
+
+  //1 GET CATEGORIES
+  knex 
+  .select('*') 
+  .from('categories'+req.params.lang)
+  .then(data => {
+    console.log("categs",data)
+    JSONresponse['categories']=data;
+    //res.json(data)
+  })
+
+  .then(
+    //2 GET TOPICS
+    knex 
+    .select('*') 
+    .from('topics'+req.params.lang) 
+    .then(data => {
+        JSONresponse['topics']=data;
+      //console.log("topics",data)
+      //res.json(data)
+    }))
+
+    .then(
+      //3 GET CATEGORY_TOPICS
+      knex 
+      .select('*') 
+      .from('category_topics'+req.params.lang) 
+      .then(data => {
+        JSONresponse['category_topics']=data;
+
+      }))
+      .then(
+        //4 GET related
+        knex 
+        .select('*') 
+        .from('related'+req.params.lang) 
+        .then(data => {
+          JSONresponse['related']=data;
+          res.json(JSONresponse)
+          console.log(JSONresponse)
+
+
+        }))
+        .catch((err)=> 
+          console.log("error retrieving db"+ err)
+      );
+
+}

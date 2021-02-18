@@ -75,3 +75,17 @@ export const addCategory = async (newCateg:string, lang:string):Promise<boolean>
   }
 }
 
+export const getUpdates = async (date:string, lang:string):Promise<Topic[]> => {
+  try{
+    let response = await axios
+    .get(`${HOSTNAME}/topicks/get_updates/${date}/${lang}`)
+    .then((response) => {
+      console.log(response)
+      return response.data;
+    })
+    return response;
+  } catch(err){
+      console.error(err);
+  }
+  return []
+}

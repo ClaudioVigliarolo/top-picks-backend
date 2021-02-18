@@ -1,10 +1,22 @@
 import React from "react";
 import Button from "@material-ui/core/Button";
+import { DEF_LAN } from "../constants/languages";
 import { COLORS } from "../constants/Colors";
+import { getUpdates } from "../api/api";
+
 import { useHistory } from "react-router-dom";
 import CustomButton from "../components/CustomButton";
 export default function StartPage() {
   const history = useHistory();
+
+  const getDate = (): string => {
+    const formatYmd: any = (date: any) => date.toISOString().slice(0, 10);
+    return formatYmd;
+  };
+
+  React.useEffect(() => {
+    getUpdates("ciao", DEF_LAN);
+  }, []);
   return (
     <div
       style={{
