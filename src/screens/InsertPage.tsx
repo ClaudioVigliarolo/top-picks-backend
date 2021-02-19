@@ -48,8 +48,10 @@ export default function StartPage() {
         onChange={handleChange}
       >
         <MenuItem value={NO_LANG}>{NO_LANG}</MenuItem>
-        {languages.map((lan: Language) => (
-          <MenuItem value={lan.value}>{lan.title}</MenuItem>
+        {languages.map((lan: Language, index) => (
+          <MenuItem key={index} value={lan.value}>
+            {lan.title}
+          </MenuItem>
         ))}
       </Select>
 

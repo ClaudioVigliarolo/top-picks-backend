@@ -1,11 +1,12 @@
-const {getDate, getHash} = require ("../functions/functions");
+const {getLastUpdateDate, setLastUpdateDate, getHash} = require ("../utils/utils");
 
+const knex = require('../db');
 
-const knex = require('../db')
 exports.categoryAdd = (req, res) => {
   knex('categories'+ req.body.lang) 
   .insert({title:req.body.category}) 
   .then(() => {
+    setLastUpdateDate();
     res.status(200)
     res.json()
   })
@@ -17,12 +18,12 @@ exports.categoryAdd = (req, res) => {
 }
 
 
-
 async function addQuestion (question, topic, lang)  {
   {
      try {
         await knex('questions'+ lang) 
         .insert({topic, id: getHash(question), title: question })
+
       }catch(err)
       {
         console.log(err + question)
@@ -35,6 +36,7 @@ exports.questionsAdd = async (req, res) => {
      Promise.all([...req.body.questions.map(async (question) => {
         await addQuestion(question, req.body.topic, req.body.lang )
         })]).then(()=>{
+          setLastUpdateDate();
           res.status(200)
           res.send()
         }).catch(err=>{
@@ -53,6 +55,7 @@ exports.topicAdd = async (req, res) => {
      await knex('category_topics'+ req.body.lang) 
       .insert({topic:req.body.topic, category: categ }) 
     });
+      setLastUpdateDate();
       res.status(200)
       res.json()
     })
@@ -92,30 +95,33 @@ exports.topicsAll = (req, res) => {
 }
 
 
-
-
-
 exports.getUpdates= (req, res) => {
   const lang = req.params.lang;
   const lastClientUpdate = req.params.date;
-  const lastServerUpdate = req.params.lang;
-
+  const lastServerUpdate = getLastUpdateDate();
   const JSONresponse={
-    
+    isUpdated: false,
     categories:[],
     topics:[],
     category_topics:[],
     related:[],
-
-
   };
+  console.log("client date"+ lastClientUpdate)
+  console.log("server date"+ lastServerUpdate)
+  //if it is already up to date return
+  if(lastClientUpdate <= lastServerUpdate)
+  {
+    JSONresponse.isUpdated=true;
+    res.json(JSONresponse)
+    return;
+  }
 
   //1 GET CATEGORIES
   knex 
   .select('*') 
-  .from('categories'+req.params.lang)
+  .from('categories'+lang)
   .then(data => {
-    console.log("categs",data)
+    //console.log("categs",data)
     JSONresponse['categories']=data;
     //res.json(data)
   })
@@ -124,7 +130,7 @@ exports.getUpdates= (req, res) => {
     //2 GET TOPICS
     knex 
     .select('*') 
-    .from('topics'+req.params.lang) 
+    .from('topics'+lang) 
     .then(data => {
         JSONresponse['topics']=data;
       //console.log("topics",data)
@@ -135,7 +141,7 @@ exports.getUpdates= (req, res) => {
       //3 GET CATEGORY_TOPICS
       knex 
       .select('*') 
-      .from('category_topics'+req.params.lang) 
+      .from('category_topics'+lang) 
       .then(data => {
         JSONresponse['category_topics']=data;
 
@@ -144,12 +150,10 @@ exports.getUpdates= (req, res) => {
         //4 GET related
         knex 
         .select('*') 
-        .from('related'+req.params.lang) 
+        .from('related'+lang) 
         .then(data => {
           JSONresponse['related']=data;
           res.json(JSONresponse)
-          console.log(JSONresponse)
-
 
         }))
         .catch((err)=> 

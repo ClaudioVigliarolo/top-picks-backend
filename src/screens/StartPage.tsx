@@ -9,13 +9,12 @@ import CustomButton from "../components/CustomButton";
 export default function StartPage() {
   const history = useHistory();
 
-  const getDate = (): string => {
-    const formatYmd: any = (date: any) => date.toISOString().slice(0, 10);
-    return formatYmd;
+  const getCurrentTime = () => {
+    return new Date().toISOString().slice(0, 10);
   };
 
   React.useEffect(() => {
-    getUpdates("ciao", DEF_LAN);
+    getUpdates(getCurrentTime(), DEF_LAN);
   }, []);
   return (
     <div

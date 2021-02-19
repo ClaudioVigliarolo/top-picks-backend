@@ -42,7 +42,8 @@
     "react-dom": "16.13.1",
     "react-router-dom": "^5.2.0",
     "react-window": "^1.8.6",
-    "serve": "^11.3.2"
+    "serve": "^11.3.2",
+    "store": "^2.0.12"
   },
   "devDependencies": {
     "@types/express": "4.17.6",
