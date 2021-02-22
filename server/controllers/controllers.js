@@ -102,6 +102,7 @@ exports.getUpdates= (req, res) => {
   const JSONresponse={
     isUpdated: false,
     categories:[],
+    questions:[],
     topics:[],
     category_topics:[],
     related:[],
@@ -147,15 +148,22 @@ exports.getUpdates= (req, res) => {
 
       }))
       .then(
-        //4 GET related
+        //4 GET RELATED
         knex 
         .select('*') 
         .from('related'+lang) 
         .then(data => {
           JSONresponse['related']=data;
-          res.json(JSONresponse)
-
         }))
+        .then(
+          //5 GET QUESTIONS
+          knex 
+          .select('*') 
+          .from('questions'+lang) 
+          .then(data => {
+            JSONresponse['questions']=data;
+            res.json(JSONresponse)
+          }))
         .catch((err)=> 
           console.log("error retrieving db"+ err)
       );
