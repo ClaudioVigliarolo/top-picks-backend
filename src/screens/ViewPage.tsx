@@ -1,13 +1,13 @@
 import React from "react";
-import TableReports from "../components/TableReports";
+import Table from "../components/Table";
 import HeaderSection from "../components/HeaderSection";
 import { COLORS } from "../constants/Colors";
-import { getReports, getTopics } from "../api/api";
+import { getTopics } from "../api/api";
 import { useParams } from "react-router-dom";
-import { Question, Report } from "../interfaces/Interfaces";
+import { Question } from "../interfaces/Interfaces";
 export default function ViewPage() {
   const { lang }: { lang: string } = useParams();
-  const [reports, setReports] = React.useState<Report[]>([]);
+  const [questions, setQuestions] = React.useState<Question[]>([]);
 
   React.useEffect(() => {
     (async () => {
@@ -16,13 +16,6 @@ export default function ViewPage() {
         console.log(retrievedQuestions);
         setQuestions(retrievedQuestions);
       }*/
-    })();
-  }, []);
-
-  React.useEffect(() => {
-    (async () => {
-      const reports = await getReports("EN");
-      setReports(reports);
     })();
   }, []);
 
@@ -36,8 +29,8 @@ export default function ViewPage() {
         width: "100vw",
       }}
     >
-      <HeaderSection title="Reports" />
-      <TableReports reports={reports} />
+      <HeaderSection title="Questions" />
+      <Table />
     </div>
   );
 }

@@ -2,7 +2,7 @@ import React from "react";
 import Button from "@material-ui/core/Button";
 import { DEF_LAN } from "../constants/languages";
 import { COLORS } from "../constants/Colors";
-import { getUpdates } from "../api/api";
+import { getReports, getUpdates } from "../api/api";
 
 import { useHistory } from "react-router-dom";
 import CustomButton from "../components/CustomButton";
@@ -13,8 +13,18 @@ export default function StartPage() {
     return new Date().toISOString().slice(0, 10);
   };
 
+  /*const newReport: Report = {
+      id: 54449920142,
+      reason: "non saprei",
+      topic: "computers",
+    };
+    addReport(newReport, "EN");
+    */
+  //
   React.useEffect(() => {
-    getUpdates(getCurrentTime(), DEF_LAN);
+    (async () => {
+      console.log(await getReports("EN"));
+    })();
   }, []);
   return (
     <div

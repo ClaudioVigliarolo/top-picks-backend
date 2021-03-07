@@ -10,8 +10,15 @@ export  interface Category {
  export interface Question {
     id: number;
     title: string;
-    selected: boolean;
-    liked: boolean;
+    topic:string;
+  }
+
+  export interface Report {
+    id: number;
+    topic:string;
+    reason:string;
+    date?:string;
+    question?:string;
   }
 
   
@@ -20,3 +27,8 @@ export  interface Category {
     english = 'EN',
   }
 
+
+  export interface EditItem{
+    label: string;
+    text:string;
+};

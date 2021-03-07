@@ -17,6 +17,7 @@ export const COLORS = {
     primaryBackground: '#fff',
     headerPrimary: "#fff",
     primaryHeaderBackground: "#FF851B",
+    secondaryBackground: 'orange',
     barColor:"#fff",
     barTextColor:'black',
     barExternalColor:'#FF851B',

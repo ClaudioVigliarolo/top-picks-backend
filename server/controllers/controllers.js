@@ -94,6 +94,42 @@ exports.topicsAll = (req, res) => {
   })
 }
 
+exports.reportsAll = (req, res) => {
+
+  knex('reports'+req.params.lang)
+    .join('questions'+req.params.lang, 'reports'+req.params.lang+'.id', 'questions'+req.params.lang+'.id')
+    .select('reports'+req.params.lang+'.id as id', 'reports'+req.params.lang+'.reason as reason',
+     'questions'+req.params.lang+'.topic as topic', 'questions'+req.params.lang+'.title as question'
+      )
+    .then(data => {
+    console.log("reports!",data)
+    //we got the reports, now we retrieve the title of the question as well
+    res.json(data)
+  })
+  .catch(err => {
+    res.json({ message: `There was an error retrieving data: ${err}` })
+  })
+}
+
+
+exports.reportAdd = async (req, res) => {
+  console.log("called");
+  const report = req.body.report;
+  console.log("add", report);
+  try{
+    knex('reports'+ req.body.lang) 
+    .insert({ id: report.id, topic:report.topic,  reason: report.reason})
+      .then(()=>{
+      setLastUpdateDate();
+      res.status(200)
+      res.json()
+    })
+  }catch(err)
+  {
+    console.log(err),
+    res.status(500)
+  }
+}
 
 exports.getUpdates= (req, res) => {
   const lang = req.params.lang;
@@ -169,3 +205,63 @@ exports.getUpdates= (req, res) => {
       );
 
 }
+
+
+exports.questionUpdate = async (req, res) => {
+  console.log("questionUpdate");
+  const id = req.body.id;
+  const title = req.body.question;
+  const lang = req.body.lang;
+ knex('questions'+ lang) 
+    .update('title', title)
+    .where('id', id)
+      .then(()=>{
+      setLastUpdateDate();
+      res.status(200)
+      res.json()
+    })
+  .catch(err)
+  {
+    console.log(err),
+    res.status(500)
+  }
+}
+
+
+exports.categoryAdd = (req, res) => {
+  knex('categories'+ req.body.lang) 
+  .insert({title:req.body.category}) 
+  .then(() => {
+    setLastUpdateDate();
+    res.status(200)
+    res.json()
+  })
+  .catch(err => {
+    console.log(err)
+    res.status(500)
+    res.json({ message: `There was an error retrieving data: ${err}` })
+  })
+}
+
+exports.reportDelete  = (req, res) => {
+ console.log("repdelete",req.body)
+ const id = req.body.id;
+ const lang = req.body.lang;
+   knex('reports'+ lang) 
+  .where('id', id)
+  .del()
+  .then(() => {
+    res.status(200)
+    res.send()
+  })
+  .catch(err => {
+    console.log(err)
+    res.status(500)
+    res.json({ message: `There was an error retrieving data: ${err}` })
+  })
+} 
+
+exports.questionDelete  = async (req, res) => {
+ 
+}
+

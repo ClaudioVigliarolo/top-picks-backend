@@ -8,6 +8,7 @@ import ReportsPage from "./screens/ReportsPage";
 import InsertCategoriesPage from "./screens/InsertCategoriesPage";
 import InsertQuestionsPage from "./screens/InsertQuestionsPage";
 import InsertTopicsPage from "./screens/InsertTopicsPage";
+import ViewPage from "./screens/ViewPage";
 
 import MainPage from "./screens/InsertPage";
 
@@ -27,9 +28,6 @@ render(
       <Route exact path="/insert">
         <MainPage />
       </Route>
-      <Route path="/reports">
-        <ReportsPage />
-      </Route>
       <Route path="/insert/categories/:lang">
         <InsertCategoriesPage />
       </Route>
@@ -38,6 +36,12 @@ render(
       </Route>
       <Route path="/insert/questions/:lang">
         <InsertQuestionsPage />
+      </Route>
+      <Route path="/view">
+        <ViewPage />
+      </Route>
+      <Route path="/reports">
+        <ReportsPage />
       </Route>
     </Switch>
   </Router>,

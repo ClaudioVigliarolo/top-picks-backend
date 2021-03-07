@@ -106,7 +106,6 @@ export default function InsertTopicsPage() {
       const val = await addQuestions(questionsArray, topic, lang);
       if (val) {
         setSuccess(true);
-        console.log("okkkk");
         setTimeout(() => setSuccess(false), 3000);
         setQuestions("");
       } else {
