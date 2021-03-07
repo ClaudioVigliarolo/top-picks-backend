@@ -116,20 +116,20 @@ exports.reportAdd = async (req, res) => {
   console.log("called");
   const report = req.body.report;
   console.log("add", report);
-  try{
     knex('reports'+ req.body.lang) 
     .insert({ id: report.id, topic:report.topic,  reason: report.reason})
       .then(()=>{
-      setLastUpdateDate();
+        console.log("yes")
       res.status(200)
-      res.json()
+      res.send()
     })
-  }catch(err)
-  {
-    console.log(err),
-    res.status(500)
-  }
+    .catch(err => {
+      console.log(err)
+      res.status(500)
+      res.json({ message: `There was an error retrieving data: ${err}` })
+     })
 }
+
 
 exports.getUpdates= (req, res) => {
   const lang = req.params.lang;

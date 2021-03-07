@@ -91,8 +91,6 @@ export const getUpdates = async (date:string, lang:string):Promise<Topic[]> => {
 }
 
 
-
-
 export const addReport = async (report:Report, lang:string):Promise<boolean> => {
   try{
     let response = await  axios
