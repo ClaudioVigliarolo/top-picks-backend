@@ -43,7 +43,7 @@ app.use(function (req, res, next) {
   res.status(404).send('Sorry we could not find that.')
 })
 
-app.use(history(path.join(__dirname, '..', 'server', 'build', 'index.html')));
+//app.use(history(path.join(__dirname, '..', 'server', 'build', 'index.html')));
 
 
 // Start express app
