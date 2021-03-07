@@ -2,6 +2,7 @@
 import React from "react";
 import { render } from "react-dom";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import { HashRouter } from "react-router-dom";
 
 // Import components
 import ReportsPage from "./screens/ReportsPage";
@@ -20,7 +21,7 @@ import StartPage from "./screens/StartPage";
 const rootElement = document.getElementById("root");
 
 render(
-  <Router>
+  <HashRouter>
     <Switch>
       <Route exact path="/">
         <StartPage />
@@ -44,7 +45,7 @@ render(
         <ReportsPage />
       </Route>
     </Switch>
-  </Router>,
+  </HashRouter>,
 
   rootElement
 );
