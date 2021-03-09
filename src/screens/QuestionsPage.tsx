@@ -4,18 +4,23 @@ import HeaderSection from "../components/HeaderSection";
 import Menu from "../components/Menu";
 
 import { COLORS } from "../constants/Colors";
-import { getReports, getTopics } from "../api/api";
+import { getCategories, getReports, getTopics, getQuestions } from "../api/api";
 import { useParams } from "react-router-dom";
-import { Question, Report, Topic } from "../interfaces/Interfaces";
-export default function ViewPage() {
+import { Category, Question, Report, Topic } from "../interfaces/Interfaces";
+import TableQuestions from "../components/tables/TableQuestions";
+const [questions, setQuestions] = React.useState<Question[]>([]);
+
+export default function TopicsPage() {
   const { lang }: { lang: string } = useParams();
-  const [reports, setReports] = React.useState<Report[]>([]);
   const [topics, setTopics] = React.useState<Topic[]>([]);
 
   React.useEffect(() => {
     (async () => {
-      const reports = await getReports("EN");
-      setReports(reports);
+      /*  const retrievedQuestions = await getQuestions(lang);
+        if (retrievedQuestions && Array.isArray(retrievedQuestions)) {
+          console.log(retrievedQuestions);
+          setQuestions(retrievedQuestions);
+        }*/
     })();
 
     (async () => {
@@ -36,24 +41,7 @@ export default function ViewPage() {
         backgroundColor: COLORS.primaryBackground,
       }}
     >
-      <TableReports reports={reports} topics={topics} />
+      <TableQuestions topics={topics} />
     </div>
   );
 }
-
-/*
-
- <div
-      style={{
-        backgroundColor: COLORS.secondaryBackground,
-        display: "flex",
-        flexDirection: "column",
-        height: "100vh",
-        width: "100vw",
-      }}
-    >
-      <HeaderSection title="Reports" />
-      <TableReports reports={reports} topics={topics} />
-    </div>
-
-    */

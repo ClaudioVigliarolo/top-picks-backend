@@ -13,15 +13,15 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import { FormControlLabel, MenuItem, Radio, Select } from "@material-ui/core";
-import { EditItem, Question, Report, Topic } from "../interfaces/Interfaces";
+import { EditItem, Question, Report, Topic } from "../../interfaces/Interfaces";
 import { useParams } from "react-router-dom";
 import {
   getTopics,
   removeQuestion,
   removeReport,
   updateQuestion,
-} from "../api/api";
-import { COLORS } from "../constants/Colors";
+} from "../../api/api";
+import { COLORS } from "../../constants/Colors";
 import InputBase from "@material-ui/core/InputBase";
 import Divider from "@material-ui/core/Divider";
 import IconButton from "@material-ui/core/IconButton";
@@ -30,9 +30,10 @@ import SearchIcon from "@material-ui/icons/Search";
 import DirectionsIcon from "@material-ui/icons/Directions";
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
-import DeleteDialog from "../components/CustomDialog";
-import EditDialog from "../components/EditDialog";
-import CustomAlert from "./CustomAlert";
+import CloseIcon from "@material-ui/icons/Close";
+import DeleteDialog from "../dialogs/CustomDialog";
+import EditDialog from "../dialogs/EditDialog";
+import CustomAlert from "../CustomAlert";
 import { Alert } from "@material-ui/lab";
 
 const StyledTableCell = withStyles((theme: Theme) =>
@@ -102,7 +103,8 @@ const useStyles = makeStyles((theme: Theme) =>
       padding: "2px 4px",
       display: "flex",
       alignItems: "center",
-      width: 350,
+      width: 300,
+      backgroundColor: "white",
     },
     input: {
       marginLeft: theme.spacing(1),
@@ -120,22 +122,23 @@ const useStyles = makeStyles((theme: Theme) =>
 
 interface TableReportsProps {
   reports: Report[];
+  topics: Topic[];
 }
 
 const NO_TOPIC = "Filter by topic";
 
 export default function TableReports(props: TableReportsProps) {
+  const [topics, setTopics] = React.useState<Topic[]>([]);
   const [topic, setTopic] = React.useState<string>(NO_TOPIC);
+  const [searchText, setSearchText] = React.useState<string>("");
   const [reports, setReports] = React.useState<Report[]>([]);
   const [currentReportId, setCurrentReportId] = React.useState<number>(-1);
   const [
     currentReportQuestion,
     setCurrentReportQuestion,
   ] = React.useState<string>("");
-
   const [success, setSuccess] = React.useState(false);
   const [deleteDialog, setDeleteDialog] = React.useState<boolean>(false);
-  const [topics, setTopics] = React.useState<Topic[]>([]);
 
   const [editDialog, setEditDialog] = React.useState<boolean>(false);
 
@@ -143,7 +146,8 @@ export default function TableReports(props: TableReportsProps) {
 
   React.useEffect(() => {
     setReports(props.reports);
-  }, [props.reports]);
+    setTopics(props.topics);
+  }, [props.reports, props.topics]);
 
   const handleTopicChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setTopic(event.target.value as string);
@@ -179,6 +183,7 @@ export default function TableReports(props: TableReportsProps) {
   };
 
   const classes = useStyles();
+
   return (
     <TableContainer
       component={Paper}
@@ -186,35 +191,44 @@ export default function TableReports(props: TableReportsProps) {
         display: "flex",
         alignItems: "center",
         flexDirection: "column",
-        backgroundColor: "orange",
+        backgroundColor: COLORS.primaryBackground,
       }}
     >
       <div
         style={{
           display: "flex",
           flexDirection: "row",
-          width: "80%",
-          justifyContent: "space-evenly",
+          alignSelf: "flex-end",
+          justifyContent: "space-between",
           marginBottom: 100,
+          width: 700,
+          padding: 20,
+          borderRadius: 10,
+          marginLeft: "40%",
+          marginRight: -5,
+          // borderWidth: 10,
+          // borderStyle: "solid",
+          backgroundColor: COLORS.primaryOrange,
         }}
       >
         <Paper component="form" className={classes.root}>
-          <IconButton
-            type="submit"
-            className={classes.iconButton}
-            aria-label="search"
-          >
-            <SearchIcon />
-          </IconButton>
-          <InputBase
-            className={classes.input}
-            placeholder="Filter Reports"
-            inputProps={{ "aria-label": "search google maps" }}
-          />
-
-          <Divider className={classes.divider} orientation="vertical" />
+          <div>
+            <IconButton
+              type="submit"
+              className={classes.iconButton}
+              aria-label="search"
+            >
+              <SearchIcon />
+            </IconButton>
+            <InputBase
+              className={classes.input}
+              placeholder="Filter Reports"
+              value={searchText}
+              onChange={(e) => setSearchText(e.currentTarget.value)}
+              inputProps={{ "aria-label": "search google maps" }}
+            />
+          </div>
         </Paper>
-
         <Select
           style={{
             textTransform: "capitalize",
@@ -289,49 +303,76 @@ export default function TableReports(props: TableReportsProps) {
                 top: "50%",
               }}
             >
-              Well Done, All Reports solved!
+              All Reports solved!
             </h1>
           )}
 
-          {reports.map((report: Report) => (
-            <StyledTableRow>
-              <StyledTableCell>{report.topic}</StyledTableCell>
-              <StyledTableCell>{report.question}</StyledTableCell>
-              <StyledEditCell>
-                {report.reason}
-                <div>
-                  <EditIcon
-                    onClick={() => {
-                      report.question &&
-                        setCurrentReportQuestion(report.question);
-                      setCurrentReportId(report.id);
-                      setEditDialog(true);
-                    }}
-                    style={{
-                      position: "absolute",
-                      right: 80,
-                      color: "orange",
-                      top: "30%",
-                      cursor: "pointer",
-                    }}
-                  />
-                  <DeleteIcon
-                    onClick={() => {
-                      setCurrentReportId(report.id);
-                      setDeleteDialog(true);
-                    }}
-                    style={{
-                      position: "absolute",
-                      right: 30,
-                      cursor: "pointer",
-                      top: "30%",
-                      color: COLORS.darkerOrange,
-                    }}
-                  />
-                </div>
-              </StyledEditCell>
-            </StyledTableRow>
-          ))}
+          {reports.map((report: Report) => {
+            if (
+              report.question &&
+              report.question
+                .toLowerCase()
+                .includes(searchText.toLowerCase()) &&
+              (topic == NO_TOPIC || topic == report.topic)
+            ) {
+              return (
+                <StyledTableRow>
+                  <StyledTableCell>{report.topic}</StyledTableCell>
+                  <StyledTableCell>{report.question}</StyledTableCell>
+                  <StyledEditCell>
+                    {report.reason}
+                    <div
+                      style={{
+                        position: "absolute",
+                        right: 30,
+                        color: "orange",
+                        top: "30%",
+                        cursor: "pointer",
+                        width: 150,
+                        display: "flex",
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <EditIcon
+                        style={{
+                          cursor: "pointer",
+                          color: COLORS.primaryOrange,
+                        }}
+                        onClick={() => {
+                          report.question &&
+                            setCurrentReportQuestion(report.question);
+                          setCurrentReportId(report.id);
+                          setEditDialog(true);
+                        }}
+                      />
+                      <DeleteIcon
+                        onClick={() => {
+                          setCurrentReportId(report.id);
+                          setDeleteDialog(true);
+                        }}
+                        style={{
+                          cursor: "pointer",
+                          color: COLORS.darkerOrange,
+                        }}
+                      />
+                      <div
+                        onClick={() => onReportDelete(report.id)}
+                        style={{
+                          cursor: "pointer",
+                          color: COLORS.blue,
+                          fontWeight: "bold",
+                          textTransform: "uppercase",
+                        }}
+                      >
+                        ignore
+                      </div>
+                    </div>
+                  </StyledEditCell>
+                </StyledTableRow>
+              );
+            }
+          })}
         </TableBody>
       </Table>
       <DeleteDialog

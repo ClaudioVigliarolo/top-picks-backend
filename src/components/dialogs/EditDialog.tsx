@@ -7,11 +7,11 @@ import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import Slide from "@material-ui/core/Slide";
 import { TransitionProps } from "@material-ui/core/transitions";
-import { COLORS } from "../constants/Colors";
+import { COLORS } from "../../constants/Colors";
 import { TextField } from "@material-ui/core";
-import { EditItem, Question, Report, Topic } from "../interfaces/Interfaces";
+import { EditItem, Question, Report, Topic } from "../../interfaces/Interfaces";
 import { Label } from "@material-ui/icons";
-import { updateQuestion } from "../api/api";
+import { updateQuestion } from "../../api/api";
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & { children?: React.ReactElement<any, any> },

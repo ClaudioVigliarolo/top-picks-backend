@@ -25,7 +25,7 @@ import SearchIcon from "@material-ui/icons/Search";
 import DirectionsIcon from "@material-ui/icons/Directions";
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
-import CustomDialog from "../components/CustomDialog";
+import CustomDialog from "./dialogs/CustomDialog";
 const StyledTableCell = withStyles((theme: Theme) =>
   createStyles({
     head: {
