@@ -35,20 +35,3 @@ export default function ViewPage() {
     </div>
   );
 }
-
-/*
-
- <div
-      style={{
-        backgroundColor: COLORS.secondaryBackground,
-        display: "flex",
-        flexDirection: "column",
-        height: "100vh",
-        width: "100vw",
-      }}
-    >
-      <HeaderSection title="Reports" />
-      <TableReports reports={reports} topics={topics} />
-    </div>
-
-    */

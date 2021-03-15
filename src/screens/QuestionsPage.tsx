@@ -1,13 +1,8 @@
 import React from "react";
-import TableReports from "../components/tables/TableReports";
-import HeaderSection from "../components/HeaderSection";
-import Menu from "../components/Menu";
-
 import { COLORS } from "../constants/colors";
-import { getCategories, getReports, getTopics, getQuestions } from "../api/api";
-import { useParams } from "react-router-dom";
 import { Category, Question, Report, Topic } from "../interfaces/Interfaces";
 import TableQuestions from "../components/tables/TableQuestions";
+import { getQuestions, getTopics } from "../api/api";
 
 export default function TopicsPage() {
   const [questions, setQuestions] = React.useState<Question[]>([]);
