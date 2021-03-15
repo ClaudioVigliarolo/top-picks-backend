@@ -17,21 +17,6 @@ exports.categoryAdd = (req, res) => {
 
   })
 }
-
-
-async function addQuestion (question, topic, lang)  {
-  {
-     try {
-        await knex('questions'+ lang) 
-        .insert({topic, id: getHash(question), title: question })
-
-      }catch(err)
-      {
-        console.log(err + question)
-        throw new Error()
-      }
-  }
-}
  
 
 exports.questionsAdd = async (req, res) => {
