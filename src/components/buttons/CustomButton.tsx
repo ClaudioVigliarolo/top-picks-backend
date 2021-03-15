@@ -1,5 +1,5 @@
 import { Button } from "@material-ui/core";
-import { COLORS } from "../constants/Colors";
+import { COLORS } from "../../constants/colors";
 
 import React from "react";
 

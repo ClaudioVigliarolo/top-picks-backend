@@ -13,7 +13,8 @@ exports.categoryAdd = (req, res) => {
   .catch(err => {
     console.log(err)
     res.status(500)
-    res.json({ message: `There was an error retrieving data: ${err}` })
+    res.send();
+
   })
 }
 
@@ -31,93 +32,150 @@ async function addQuestion (question, topic, lang)  {
       }
   }
 }
+ 
 
 exports.questionsAdd = async (req, res) => {
-     Promise.all([...req.body.questions.map(async (question) => {
-        await addQuestion(question, req.body.topic, req.body.lang )
-        })]).then(()=>{
-          setLastUpdateDate();
-          res.status(200)
-          res.send()
-        }).catch(err=>{
-        res.status(500)
+  const lang = req.body.lang;
+  const questions=req.body.questions;
+  console.log(req.body)
+  const newQuestions = questions.map(question => 
+    ({ id: question.id, topic_id:question.topic_id, title: question.title }));
+
+    knex('questions'+ lang) 
+      .insert(newQuestions)
+      .then(()=>{
+        res.status(200)
         res.send()
-        });
+      })
+      .catch((e) => {console.log(e);
+      res.status(500)
+      res.send()
+    });
 }
 
 
+
+
 exports.topicAdd = async (req, res) => {
-  try{
-    knex('topics'+ req.body.lang) 
-    .insert({title:req.body.topic, source: "TopPicks Creators" })
-    .then(()=>{
-      req.body.categories.forEach(async categ =>{
-     await knex('category_topics'+ req.body.lang) 
-      .insert({topic:req.body.topic, category: categ }) 
+  const id = req.body.id;
+  const categoriesId = req.body.categoriesId;
+  const title = req.body.title;
+  const source = req.body.source;
+  const lang = req.body.lang;
+
+  const newCategoryTopics = categoriesId.map(categoryId => 
+    ({ topic_id: id, category_id:categoryId }));
+
+        knex('topics'+ lang) 
+        .insert({id, title, source })
+        .then(()=>
+          knex('category_topics'+ lang) 
+          .insert(newCategoryTopics)
+        ).then(()=>{
+          res.status(200)
+          res.send()
+        })
+      .catch(() => {console.log("MYERR");
+      res.status(500)
+      res.send()
     });
-      setLastUpdateDate();
-      res.status(200)
-      res.json()
-    })
-  }catch(err)
-  {
-    console.log(err),
-    res.status(500)
-  }
+
 }
 
 
 exports.categoriesAll = (req, res) => {
+  const lang = req.params.lang;
   knex 
-  .select('title')
-  .from('categories'+req.params.lang) 
+  .select("*")
+  .from('categories'+lang) 
   .then(data => {
     console.log(data)
     res.json(data)
   })
   .catch(err => {
-    res.json({ message: `There was an error retrieving data: ${err}` })
+    res.status(500)
+    res.send();
+    
   })
 }
 
 
+//get all category topics and topics
 exports.topicsAll = (req, res) => {
+  const lang = req.params.lang;
+  const JSONresponse={
+    topics:[],
+    category_topics:[],
+    related:[],
+  };
+
   knex 
-  .select('title') 
-  .from('topics'+req.params.lang) 
+  .select('*') 
+  .from('topics'+lang)  
+  .orderBy('timestamp','desc')
   .then(data => {
-    console.log("topics",data)
+    JSONresponse['topics']=data;
+  })
+  .then(
+    knex 
+    .select('*') 
+    .from('category_topics'+lang) 
+    .then(data => {
+      JSONresponse['category_topics']=data;
+      res.json(JSONresponse)
+    }))
+  .catch(err => {
+    res.status(500)
+    res.send();
+
+  })
+}
+
+
+exports.questionsAll = (req, res) => {
+  const lang = req.params.lang;
+  knex 
+  .select("id", "topic_id", "title", "timestamp")
+  .from('questions'+lang) 
+  .orderBy('timestamp','desc')
+  .then(data => {
     res.json(data)
   })
   .catch(err => {
-    res.json({ message: `There was an error retrieving data: ${err}` })
+    res.status(500)
+    res.send();
+    
   })
 }
 
-exports.reportsAll = (req, res) => {
 
-  knex('reports'+req.params.lang)
-    .join('questions'+req.params.lang, 'reports'+req.params.lang+'.id', 'questions'+req.params.lang+'.id')
-    .select('reports'+req.params.lang+'.id as id', 'reports'+req.params.lang+'.reason as reason',
-     'questions'+req.params.lang+'.topic as topic', 'questions'+req.params.lang+'.title as question'
-      )
+exports.reportsAll = (req, res) => 
+{ 
+  const lang = req.params.lang;
+  knex(`reports${lang}`)
+  .join(`questions${lang}`,`questions${lang}.id`,`reports${lang}.question_id`  )
+    .select(`questions${lang}.title AS title`,` questions${lang}.id AS question_id`,` questions${lang}.topic_id AS topic_id`,
+    ` reports${lang}.reason AS reason`,` reports${lang}.timestamp AS timestamp`
+    )
     .then(data => {
     console.log("reports!",data)
     //we got the reports, now we retrieve the title of the question as well
     res.json(data)
   })
   .catch(err => {
-    res.json({ message: `There was an error retrieving data: ${err}` })
-  })
+    console.log(err)
+    res.status(500)
+    res.send();
+   })
 }
 
 
+
+
 exports.reportAdd = async (req, res) => {
-  console.log("called");
   const report = req.body.report;
-  console.log("add", report);
     knex('reports'+ req.body.lang) 
-    .insert({ id: report.id, topic:report.topic,  reason: report.reason})
+    .insert({ question_id: report.question_id, reason: report.reason})
       .then(()=>{
         console.log("yes")
       res.status(200)
@@ -126,7 +184,7 @@ exports.reportAdd = async (req, res) => {
     .catch(err => {
       console.log(err)
       res.status(500)
-      res.json({ message: `There was an error retrieving data: ${err}` })
+      res.send();
      })
 }
 
@@ -208,29 +266,116 @@ exports.getUpdates= (req, res) => {
 
 
 exports.questionUpdate = async (req, res) => {
-  console.log("questionUpdate");
   const id = req.body.id;
-  const title = req.body.question;
+  const topicId = req.body.topicId;
+  const title = req.body.title;
   const lang = req.body.lang;
  knex('questions'+ lang) 
-    .update('title', title)
+ .update({'title':title , 'topic_id':topicId, 'timestamp':Date() })
     .where('id', id)
       .then(()=>{
       setLastUpdateDate();
       res.status(200)
       res.json()
     })
-  .catch(err)
-  {
-    console.log(err),
-    res.status(500)
-  }
+    .catch(err => {
+      console.log(err)
+      res.status(500)
+     res.send();
+     
+    })
 }
 
 
+exports.categoryDelete  = (req, res) => {
+  const id = req.body.id;
+  const lang = req.body.lang;
+    knex('categories'+ lang) 
+   .where('id', id)
+   .del()
+   .then(() => {
+     res.status(200)
+     res.send()
+   })
+   .catch(err => {
+     console.log(err)
+     res.status(500)
+    res.send();
+    
+   })
+ } 
+ 
+ exports.topicDelete  = (req, res) => {
+  const id = req.body.id;
+  const lang = req.body.lang;
+
+  //delete the values in category topics table first 
+  knex('category_topics'+ lang) 
+  .where('topic_id', id)
+  .del()
+  .then(() => {
+    res.status(200)
+    res.send()
+  })
+  .then(()=>{
+    
+    //delete key in topic table
+    knex('topics'+ lang) 
+   .where('id', id)
+   .del()
+   .then(() => {
+     res.status(200)
+     res.send()
+   })
+   .catch(err => {
+     console.log(err)
+     res.status(500)
+     res.send();
+
+   })
+  })
+  
+ } 
+
+
+exports.topicUpdate = async (req, res) => {
+  const id = req.body.id;
+  const title = req.body.title;
+  const lang = req.body.lang;
+  const categoriesId = req.body.categoriesId;
+  const newCategoryTopics = categoriesId.map(categoryId => 
+    ({ topic_id: id, category_id:categoryId }));
+
+      knex('topics'+ lang) 
+        .update({'title':title , 'timestamp':Date() })
+        .where('id', id)
+          .then(()=>
+            //step 1: delete all previous tuples
+              knex('category_topics'+lang)
+              .where('topic_id', id)
+              .del()
+          )   .then(() => 
+            //steps 2: add new added topic categories
+                knex('category_topics'+ lang) 
+                .insert(newCategoryTopics)
+              ).then(()=>{
+                console.log("finish ok")
+                res.status(200)
+                res.json()
+              })
+            .catch(err => {
+              console.log(err),
+              res.status(500)
+              res.send();
+        })
+      }
+
+
 exports.categoryAdd = (req, res) => {
+  const title= req.body.title;
+  const id= req.body.id;
   knex('categories'+ req.body.lang) 
-  .insert({title:req.body.category}) 
+  .insert({title, id }) 
   .then(() => {
     setLastUpdateDate();
     res.status(200)
@@ -239,9 +384,29 @@ exports.categoryAdd = (req, res) => {
   .catch(err => {
     console.log(err)
     res.status(500)
-    res.json({ message: `There was an error retrieving data: ${err}` })
+    res.send();
   })
 }
+
+exports.categoryUpdate = (req, res) => {
+  const title= req.body.title;
+  const id= req.body.id;
+  const lang= req.body.lang;
+  knex('categories'+ lang) 
+  .update('title', title)
+  .where('id', id)
+    .then(()=>{
+    setLastUpdateDate();
+    res.status(200)
+    res.json()
+  })
+  .catch(err => {
+    console.log(err)
+    res.status(500)
+    res.send();
+  })
+}
+
 
 exports.reportDelete  = (req, res) => {
  console.log("repdelete",req.body)
@@ -257,7 +422,8 @@ exports.reportDelete  = (req, res) => {
   .catch(err => {
     console.log(err)
     res.status(500)
-    res.json({ message: `There was an error retrieving data: ${err}` })
+    res.send();
+
   })
 } 
 

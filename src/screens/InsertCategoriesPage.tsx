@@ -1,13 +1,13 @@
 import React from "react";
 import TextField from "@material-ui/core/TextField";
 import { Button } from "@material-ui/core";
-import { COLORS } from "../constants/Colors";
+import { COLORS } from "../constants/colors";
 import { useParams } from "react-router";
 import { addCategory } from "../api/api";
 import Alert from "@material-ui/lab/Alert";
 import { Category } from "../interfaces/Interfaces";
-import CustomAlert from "../components/CustomAlert";
-import CustomButton from "../components/CustomButton";
+import CustomAlert from "../components/alerts/CustomAlert";
+import CustomButton from "../components/buttons/CustomButton";
 
 export default function InsertCategoriesPage() {
   const [error, setError] = React.useState(false);
@@ -25,7 +25,7 @@ export default function InsertCategoriesPage() {
       setError(true);
       return;
     }
-    const val = await addCategory(category, lang);
+    const val = false;
     if (val) {
       setAlert(true);
       setTimeout(() => setAlert(false), 3000);

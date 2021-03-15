@@ -21,10 +21,9 @@ const app = express()
 app.use(cors())
 app.use(helmet())
 app.use(compression())
-app.use(bodyParser.urlencoded({ extended: false }))
-app.use(bodyParser.json())
 
-
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 app.use(morgan('dev'));
 app.use(express.static(__dirname + '/public'));

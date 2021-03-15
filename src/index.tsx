@@ -13,6 +13,7 @@ import ViewPage from "./screens/ViewPage";
 import CategoriesPage from "./screens/CategoriesPage";
 import TopicsPage from "./screens/TopicsPage";
 import MainPage from "./screens/InsertPage";
+import QuestionsPage from "./screens/QuestionsPage";
 
 // Import styles
 import "./styles/styles.css";
@@ -40,7 +41,7 @@ render(
             <TopicsPage />
           </Route>
           <Route path="/insert/questions/:lang">
-            <InsertQuestionsPage />
+            <QuestionsPage />
           </Route>
           <Route path="/view">
             <ViewPage />

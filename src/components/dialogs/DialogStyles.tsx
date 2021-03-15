@@ -7,7 +7,9 @@ import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import Slide from "@material-ui/core/Slide";
 import { TransitionProps } from "@material-ui/core/transitions";
-import { COLORS } from "../../constants/Colors";
+import { COLORS } from "../../constants/colors";
+import { TextField } from "@material-ui/core";
+import { Alert } from "@material-ui/lab";
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & { children?: React.ReactElement<any, any> },
@@ -16,52 +18,59 @@ const Transition = React.forwardRef(function Transition(
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-interface AlertDialogSlideProps {
+interface TextDialogProps {
   open: boolean;
-  title: string;
-  description: string;
   onConfirm: any;
+  confirmButtonText?: string;
   onRefuse: any;
+  refuseButtonText?: string;
+  text: string;
+  headerText: string;
+  children?: any;
+  error: boolean;
+  onChange: (text: string) => void;
+  minWidth: number;
 }
-export default function AlertDialogSlide(props: AlertDialogSlideProps) {
-  const [open, setOpen] = React.useState(false);
-
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
+export const CustomDialog = (props: TextDialogProps) => {
   return (
     <div>
       <Dialog
         open={props.open}
         TransitionComponent={Transition}
         keepMounted
-        onClose={handleClose}
         aria-labelledby="alert-dialog-slide-title"
         aria-describedby="alert-dialog-slide-description"
       >
-        <DialogTitle id="alert-dialog-slide-title">{props.title}</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-slide-description">
-            {props.description}
-          </DialogContentText>
+        <DialogTitle id="alert-dialog-slide-title">
+          {props.headerText}
+        </DialogTitle>
+
+        <DialogContent style={{ minWidth: props.minWidth }}>
+          <TextField
+            error={props.error}
+            autoFocus
+            InputLabelProps={{ shrink: true }}
+            margin="dense"
+            label="text"
+            id="standard-helperText"
+            value={props.text}
+            onChange={(e) => props.onChange(e.currentTarget.value)}
+            fullWidth
+          />
         </DialogContent>
+        {props.children}
         <DialogActions>
           <Button
             onClick={props.onRefuse}
             style={{ color: COLORS.darkerOrange }}
           >
-            Disagree
+            {props.refuseButtonText ? props.refuseButtonText : "Close"}
           </Button>
           <Button onClick={props.onConfirm} style={{ color: COLORS.blue }}>
-            Confirm
+            {props.confirmButtonText ? props.confirmButtonText : "Submit"}
           </Button>
         </DialogActions>
       </Dialog>
     </div>
   );
-}
+};

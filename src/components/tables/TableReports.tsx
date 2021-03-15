@@ -1,422 +1,248 @@
 import React from "react";
 import {
-  withStyles,
-  Theme,
-  createStyles,
-  makeStyles,
-} from "@material-ui/core/styles";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableContainer from "@material-ui/core/TableContainer";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
-import Paper from "@material-ui/core/Paper";
-import { FormControlLabel, MenuItem, Radio, Select } from "@material-ui/core";
-import { EditItem, Question, Report, Topic } from "../../interfaces/Interfaces";
-import { useParams } from "react-router-dom";
-import {
-  getTopics,
-  removeQuestion,
-  removeReport,
-  updateQuestion,
-} from "../../api/api";
-import { COLORS } from "../../constants/Colors";
-import InputBase from "@material-ui/core/InputBase";
-import Divider from "@material-ui/core/Divider";
-import IconButton from "@material-ui/core/IconButton";
-import MenuIcon from "@material-ui/icons/Menu";
-import SearchIcon from "@material-ui/icons/Search";
-import DirectionsIcon from "@material-ui/icons/Directions";
+  CustomTable,
+  StyledEditCell,
+  StyledTableRow,
+  useStyles,
+  StyledTableCell,
+} from "./TableStyles";
+import { CONSTANTS } from "../../constants/constants";
+import { Report, ReportHandled, Topic } from "../../interfaces/Interfaces";
+import { deleteQuestion, deleteReport, updateQuestion } from "../../api/api";
+import DeleteDialog from "../dialogs/ConfirmDialog";
+import EditDialog from "../dialogs/EditDialog";
+import Select from "../filters/Select";
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
-import CloseIcon from "@material-ui/icons/Close";
-import DeleteDialog from "../dialogs/CustomDialog";
-import EditDialog from "../dialogs/EditDialog";
-import CustomAlert from "../CustomAlert";
-import { Alert } from "@material-ui/lab";
-
-const StyledTableCell = withStyles((theme: Theme) =>
-  createStyles({
-    head: {
-      backgroundColor: "orange",
-      width: "100%",
-      color: theme.palette.common.white,
-    },
-    body: {
-      fontSize: 18,
-    },
-  })
-)(TableCell);
-
-const StyledEditCell = withStyles((theme: Theme) =>
-  createStyles({
-    head: {
-      backgroundColor: "orange",
-      width: "100%",
-      color: theme.palette.common.white,
-    },
-    body: {
-      fontSize: 14,
-      color: "black",
-      position: "relative",
-    },
-  })
-)(TableCell);
-
-const StyledTableRow = withStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      "&:nth-of-type(odd)": {
-        backgroundColor: theme.palette.action.hover,
-      },
-    },
-  })
-)(TableRow);
-
-function createData(
-  name: string,
-  calories: number,
-  fat: number,
-  carbs: number,
-  protein: number
-) {
-  return { name, calories, fat, carbs, protein };
-}
-
-const rows = [
-  createData("Frozen yoghurt", 159, 6.0, 24, 4.0),
-  createData("Ice cream sandwich", 237, 9.0, 37, 4.3),
-  createData("Eclair", 262, 16.0, 24, 6.0),
-  createData("Cupcake", 305, 3.7, 67, 4.3),
-  createData("Gingerbread", 356, 16.0, 49, 3.9),
-];
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    table: {
-      width: "85%",
-      alignSelf: "center",
-      backgroundColor: "white",
-    },
-    root: {
-      padding: "2px 4px",
-      display: "flex",
-      alignItems: "center",
-      width: 300,
-      backgroundColor: "white",
-    },
-    input: {
-      marginLeft: theme.spacing(1),
-      flex: 1,
-    },
-    iconButton: {
-      padding: 10,
-    },
-    divider: {
-      height: 28,
-      margin: 4,
-    },
-  })
-);
+import TransactionAlert from "../alerts/TransactionAlert";
+import SearchBar from "../filters/searchBar";
 
 interface TableReportsProps {
-  reports: Report[];
+  reports: ReportHandled[];
   topics: Topic[];
 }
 
 const NO_TOPIC = "Filter by topic";
 
-export default function TableReports(props: TableReportsProps) {
+export default function TableCategories(props: TableReportsProps) {
+  const [success, setSuccess] = React.useState(false);
+  const [error, setError] = React.useState(false);
   const [topics, setTopics] = React.useState<Topic[]>([]);
   const [topic, setTopic] = React.useState<string>(NO_TOPIC);
+  const [reports, setReports] = React.useState<ReportHandled[]>([]);
   const [searchText, setSearchText] = React.useState<string>("");
-  const [reports, setReports] = React.useState<Report[]>([]);
   const [currentReportId, setCurrentReportId] = React.useState<number>(-1);
-  const [
-    currentReportQuestion,
-    setCurrentReportQuestion,
-  ] = React.useState<string>("");
-  const [success, setSuccess] = React.useState(false);
-  const [deleteDialog, setDeleteDialog] = React.useState<boolean>(false);
-
+  const [currentReportTitle, setCurrentReportTitle] = React.useState<string>(
+    ""
+  );
   const [editDialog, setEditDialog] = React.useState<boolean>(false);
-
-  const { lang }: { lang: string } = useParams();
-
+  const [deleteDialog, setDeleteDialog] = React.useState<boolean>(false);
   React.useEffect(() => {
     setReports(props.reports);
     setTopics(props.topics);
   }, [props.reports, props.topics]);
 
+  const classes = useStyles();
+
   const handleTopicChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setTopic(event.target.value as string);
   };
 
-  const onReportDelete = async (id: number): Promise<boolean> => {
-    console.log("why deleting");
-    const success = await removeReport(id, "EN");
-    console.log("ss", success);
-    if (!success) return false;
-    const newReports = reports.filter(function (item: Report) {
-      return item.id != id;
-    });
-
-    setReports([...newReports]);
-
-    return true;
+  const getTopicIdByTitle = (topicTitle: string): number => {
+    const myTopic = topics.find((topic) => topic.title == topicTitle);
+    return myTopic ? myTopic.id : -1;
   };
 
-  const onQuestionUpdate = async (
+  const onReportEdit = async (
     id: number,
+    topicId: number,
     newQuestion: string
-  ): Promise<boolean> => {
-    const success = await updateQuestion(id, newQuestion, "EN");
-    if (!success) return false;
-    const newReports = reports;
-    newReports.forEach(function (item: Report) {
-      if (item.id == id) item.question = newQuestion;
+  ) => {
+    //1 delete report
+    const val1 = await deleteReport(id, "EN");
+
+    //2 update the question with new content
+    const val2 = await updateQuestion(id, newQuestion, topicId, "EN");
+
+    if (!val1 || !val2) {
+      setError(true);
+      setTimeout(() => setError(false), CONSTANTS.ALERT_TIME);
+      return;
+    }
+
+    //update locally
+    const newReports = reports.filter(function (item: Report) {
+      return item.question_id != id;
     });
 
     setReports([...newReports]);
-    return true;
+
+    setSuccess(true);
+    setTimeout(() => setSuccess(false), CONSTANTS.ALERT_TIME);
   };
 
-  const classes = useStyles();
+  const getTopicTitle = (topicId: number): string => {
+    const myTopic = topics.find((topic) => topic.id == topicId);
+    return myTopic ? myTopic.title : "error:topic removed";
+  };
+
+  const onQuestionDelete = async (id: number) => {
+    //1 delete report
+    const val1 = await deleteReport(id, "EN");
+
+    //2 delete the question
+    const val2 = await deleteQuestion(id, "EN");
+
+    if (!val1 || !val2) {
+      setError(true);
+      setTimeout(() => setError(false), CONSTANTS.ALERT_TIME);
+      return;
+    }
+
+    //update locally
+    const newReports = reports.filter(function (item: Report) {
+      return item.question_id != id;
+    });
+
+    setReports([...newReports]);
+
+    setSuccess(true);
+    setTimeout(() => setSuccess(false), CONSTANTS.ALERT_TIME);
+  };
+
+  const onReportDelete = async (id: number) => {
+    const val = await deleteReport(id, "EN");
+
+    if (!val) {
+      setError(true);
+      setTimeout(() => setError(false), CONSTANTS.ALERT_TIME);
+      return;
+    }
+
+    //update locally
+    const newReports = reports.filter(function (item: Report) {
+      return item.question_id != id;
+    });
+
+    setReports([...newReports]);
+
+    setSuccess(true);
+    setTimeout(() => setSuccess(false), CONSTANTS.ALERT_TIME);
+  };
+
+  const onEdit = (id: number, title: string) => {
+    setCurrentReportTitle(title);
+    setCurrentReportId(id);
+    setEditDialog(true);
+  };
+
+  const onDelete = (id: number) => {
+    setCurrentReportId(id);
+    setDeleteDialog(true);
+  };
+
+  const onIgnore = (id: number) => {
+    onReportDelete(id);
+  };
+
+  const renderRows = (reports: ReportHandled[]) => {
+    return reports.map((report: ReportHandled) => {
+      if (report.title.toLowerCase().includes(searchText.toLowerCase())) {
+        return (
+          <StyledTableRow>
+            <StyledTableCell>{getTopicTitle(report.topic_id)}</StyledTableCell>
+            <StyledTableCell>{report.title}</StyledTableCell>
+            <StyledEditCell>
+              {report.reason}
+              <div style={{ width: 150 }} className={classes.iconsContainer}>
+                <EditIcon
+                  className={classes.editIcon}
+                  onClick={() => {
+                    onEdit(report.question_id, report.title);
+                  }}
+                />
+                <DeleteIcon
+                  onClick={() => {
+                    onDelete(report.question_id);
+                  }}
+                  className={classes.deleteIcon}
+                />
+                <div
+                  onClick={() => {
+                    onIgnore(report.question_id);
+                  }}
+                  className={classes.ignoreIcon}
+                >
+                  ignore
+                </div>
+              </div>
+            </StyledEditCell>
+          </StyledTableRow>
+        );
+      }
+    });
+  };
 
   return (
-    <TableContainer
-      component={Paper}
-      style={{
-        display: "flex",
-        alignItems: "center",
-        flexDirection: "column",
-        backgroundColor: COLORS.primaryBackground,
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          alignSelf: "flex-end",
-          justifyContent: "space-between",
-          marginBottom: 100,
-          width: 700,
-          padding: 20,
-          borderRadius: 10,
-          marginLeft: "40%",
-          marginRight: -5,
-          // borderWidth: 10,
-          // borderStyle: "solid",
-          backgroundColor: COLORS.primaryOrange,
-        }}
-      >
-        <Paper component="form" className={classes.root}>
-          <div>
-            <IconButton
-              type="submit"
-              className={classes.iconButton}
-              aria-label="search"
-            >
-              <SearchIcon />
-            </IconButton>
-            <InputBase
-              className={classes.input}
-              placeholder="Filter Reports"
-              value={searchText}
-              onChange={(e) => setSearchText(e.currentTarget.value)}
-              inputProps={{ "aria-label": "search google maps" }}
-            />
-          </div>
-        </Paper>
-        <Select
-          style={{
-            textTransform: "capitalize",
-            width: 200,
-            fontSize: 20,
-            color: "#fff",
-          }}
-          labelId="demo-simple-select-label"
-          id="demo-simple-select"
-          value={topic}
-          onChange={handleTopicChange}
-        >
-          <MenuItem value={NO_TOPIC}>{NO_TOPIC}</MenuItem>
-          {topics.map((lan: Topic) => (
-            <MenuItem value={lan.title}>{lan.title}</MenuItem>
-          ))}
-        </Select>
+    <>
+      <div className={classes.headerSection}>
+        <SearchBar
+          placeholder="Filter Topics"
+          setSearchText={(text) => setSearchText(text)}
+          searchText={searchText}
+        />
+        <div>
+          <Select
+            handleChange={handleTopicChange}
+            value={topic}
+            values={topics.map((t) => t.title)}
+            defaultValue={NO_TOPIC}
+          />
+        </div>
       </div>
 
-      <Table className={classes.table} aria-label="customized table">
-        <colgroup>
-          <col style={{ width: "25%" }} />
-          <col style={{ width: "50%" }} />
-          <col style={{ width: "25%" }} />
-        </colgroup>
-
-        <TableHead>
-          <TableRow
-            style={{
-              color: "#fff",
-              backgroundColor: COLORS.darkerOrange,
-            }}
-          >
-            <TableCell
-              style={{
-                color: "#fff",
-                fontSize: 16,
-                textTransform: "uppercase",
-              }}
-            >
-              Topic
-            </TableCell>
-            <TableCell
-              style={{
-                color: "#fff",
-                fontSize: 16,
-                textTransform: "uppercase",
-              }}
-            >
-              Question
-            </TableCell>
-            <TableCell
-              style={{
-                color: "#fff",
-                fontSize: 16,
-                textTransform: "uppercase",
-              }}
-            >
-              Reason
-            </TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {reports.length == 0 && (
-            <h1
-              style={{
-                position: "absolute",
-                color: "white",
-                textAlign: "center",
-                left: 0,
-                right: 0,
-                top: "50%",
-              }}
-            >
-              All Reports solved!
-            </h1>
-          )}
-
-          {reports.map((report: Report) => {
-            if (
-              report.question &&
-              report.question
-                .toLowerCase()
-                .includes(searchText.toLowerCase()) &&
-              (topic == NO_TOPIC || topic == report.topic)
-            ) {
-              return (
-                <StyledTableRow>
-                  <StyledTableCell>{report.topic}</StyledTableCell>
-                  <StyledTableCell>{report.question}</StyledTableCell>
-                  <StyledEditCell>
-                    {report.reason}
-                    <div
-                      style={{
-                        position: "absolute",
-                        right: 30,
-                        color: "orange",
-                        top: "30%",
-                        cursor: "pointer",
-                        width: 150,
-                        display: "flex",
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <EditIcon
-                        style={{
-                          cursor: "pointer",
-                          color: COLORS.primaryOrange,
-                        }}
-                        onClick={() => {
-                          report.question &&
-                            setCurrentReportQuestion(report.question);
-                          setCurrentReportId(report.id);
-                          setEditDialog(true);
-                        }}
-                      />
-                      <DeleteIcon
-                        onClick={() => {
-                          setCurrentReportId(report.id);
-                          setDeleteDialog(true);
-                        }}
-                        style={{
-                          cursor: "pointer",
-                          color: COLORS.darkerOrange,
-                        }}
-                      />
-                      <div
-                        onClick={() => onReportDelete(report.id)}
-                        style={{
-                          cursor: "pointer",
-                          color: COLORS.blue,
-                          fontWeight: "bold",
-                          textTransform: "uppercase",
-                        }}
-                      >
-                        ignore
-                      </div>
-                    </div>
-                  </StyledEditCell>
-                </StyledTableRow>
-              );
-            }
-          })}
-        </TableBody>
-      </Table>
+      {reports.length > 0 && (
+        <CustomTable
+          columns={["25%", "50%", "25%"]}
+          columnNames={["topic", "question", "reason"]}
+          body={renderRows(reports)}
+        />
+      )}
+      {reports.length == 0 && (
+        <div className={classes.noItemsAlert}>All Reports have been solved</div>
+      )}
       <DeleteDialog
         open={deleteDialog}
         onConfirm={() => {
+          onQuestionDelete(currentReportId);
+          setCurrentReportId(-1);
+          setCurrentReportTitle("");
           setDeleteDialog(false);
-          //remove report  from db and local
-          if (onReportDelete(currentReportId)) {
-            setSuccess(true);
-            setTimeout(() => setSuccess(false), 3000);
-          }
         }}
         title="Proceed to Delete the question?"
         description="The question record will be removed from the main database. You cannot undo this operation"
         onRefuse={() => {
+          setCurrentReportId(-1);
+          setCurrentReportTitle("");
           setDeleteDialog(false);
         }}
       />
 
       <EditDialog
         open={editDialog}
-        onConfirm={async (newQuestion: string) => {
-          setEditDialog(false);
-          if (
-            (await onReportDelete(currentReportId)) &&
-            (await onQuestionUpdate(currentReportId, newQuestion))
-          ) {
-            setSuccess(true);
-            setTimeout(() => setSuccess(false), 3000);
-          }
+        onConfirm={(newQuestion: string) => {
+          onReportEdit(currentReportId, getTopicIdByTitle(topic), newQuestion);
         }}
         id={currentReportId}
-        title="Editing question"
-        question={currentReportQuestion}
+        header="Editing question"
+        title={currentReportTitle}
         onRefuse={() => {
+          setCurrentReportId(-1);
+          setCurrentReportTitle("");
           setEditDialog(false);
         }}
       />
-
-      <CustomAlert
-        visible={success}
-        text="Updated successfully!"
-        type="success"
-      />
-    </TableContainer>
+      <TransactionAlert success={success} error={error} />
+    </>
   );
 }

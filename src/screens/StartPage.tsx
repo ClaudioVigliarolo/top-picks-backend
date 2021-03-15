@@ -1,11 +1,11 @@
 import React from "react";
 import Button from "@material-ui/core/Button";
 import { DEF_LAN } from "../constants/languages";
-import { COLORS } from "../constants/Colors";
+import { COLORS } from "../constants/colors";
 import { addReport, getReports, getUpdates } from "../api/api";
 
 import { useHistory } from "react-router-dom";
-import CustomButton from "../components/CustomButton";
+import CustomButton from "../components/buttons/CustomButton";
 import { Report } from "../interfaces/Interfaces";
 export default function StartPage() {
   const history = useHistory();
@@ -14,17 +14,7 @@ export default function StartPage() {
     return new Date().toISOString().slice(0, 10);
   };
 
-  React.useEffect(() => {
-    /*  (async () => {
-     const newReport: Report = {
-        id: 2594814,
-        reason: "non saprei",
-        topic: "easter",
-      };
-
-      addReport(newReport, "EN");
-    })();*/
-  }, []);
+  React.useEffect(() => {}, []);
   return (
     <div
       style={{

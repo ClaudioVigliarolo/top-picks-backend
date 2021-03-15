@@ -7,8 +7,7 @@ import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import Slide from "@material-ui/core/Slide";
 import { TransitionProps } from "@material-ui/core/transitions";
-import { COLORS } from "../../constants/Colors";
-import { TextField } from "@material-ui/core";
+import { COLORS } from "../../constants/colors";
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & { children?: React.ReactElement<any, any> },
@@ -17,21 +16,22 @@ const Transition = React.forwardRef(function Transition(
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-interface CategoryDialogProps {
+interface AlertDialogSlideProps {
   open: boolean;
+  title: string;
+  description: string;
   onConfirm: any;
   onRefuse: any;
 }
-export default function CategoryDialog(props: CategoryDialogProps) {
-  const [category, setcategory] = React.useState<string>("");
-  const [error, setError] = React.useState(false);
+export default function AlertDialogSlide(props: AlertDialogSlideProps) {
+  const [open, setOpen] = React.useState(false);
 
-  const onSubmit = async () => {
-    if (category == "") {
-      setError(true);
-      return;
-    }
-    props.onConfirm(category);
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
   };
 
   return (
@@ -40,35 +40,25 @@ export default function CategoryDialog(props: CategoryDialogProps) {
         open={props.open}
         TransitionComponent={Transition}
         keepMounted
+        onClose={handleClose}
         aria-labelledby="alert-dialog-slide-title"
         aria-describedby="alert-dialog-slide-description"
       >
-        <DialogTitle id="alert-dialog-slide-title">
-          Add New Category
-        </DialogTitle>
-
-        <DialogContent style={{ minWidth: 400 }}>
-          <TextField
-            error={error}
-            autoFocus
-            InputLabelProps={{ shrink: true }}
-            margin="dense"
-            label="category"
-            id="standard-helperText"
-            value={category}
-            onChange={(e) => setcategory(e.currentTarget.value)}
-            fullWidth
-          />
+        <DialogTitle id="alert-dialog-slide-title">{props.title}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-slide-description">
+            {props.description}
+          </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button
             onClick={props.onRefuse}
             style={{ color: COLORS.darkerOrange }}
           >
-            Close
+            Disagree
           </Button>
-          <Button onClick={onSubmit} style={{ color: COLORS.blue }}>
-            Add
+          <Button onClick={props.onConfirm} style={{ color: COLORS.blue }}>
+            Confirm
           </Button>
         </DialogActions>
       </Dialog>

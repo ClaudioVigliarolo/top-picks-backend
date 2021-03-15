@@ -9,7 +9,7 @@ import {
   MenuItem,
   Select,
 } from "@material-ui/core";
-import { COLORS } from "../constants/Colors";
+import { COLORS } from "../constants/colors";
 import {
   createStyles,
   makeStyles,
@@ -22,8 +22,8 @@ import Alert from "@material-ui/lab/Alert";
 import { Category, Topic } from "../interfaces/Interfaces";
 import ListItem from "@material-ui/core/ListItem";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
-import CustomAlert from "../components/CustomAlert";
-import CustomButton from "../components/CustomButton";
+import CustomAlert from "../components/alerts/CustomAlert";
+import CustomButton from "../components/buttons/CustomButton";
 const MIN_QUESTIONS = 2;
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -103,7 +103,7 @@ export default function InsertTopicsPage() {
 
   const onSubmit = async (): Promise<void> => {
     if (questionsArray && questionsArray.length > MIN_QUESTIONS) {
-      const val = await addQuestions(questionsArray, topic, lang);
+      const val = false;
       if (val) {
         setSuccess(true);
         setTimeout(() => setSuccess(false), 3000);

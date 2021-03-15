@@ -7,11 +7,8 @@ import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import Slide from "@material-ui/core/Slide";
 import { TransitionProps } from "@material-ui/core/transitions";
-import { COLORS } from "../../constants/Colors";
+import { COLORS } from "../../constants/colors";
 import { TextField } from "@material-ui/core";
-import { EditItem, Question, Report, Topic } from "../../interfaces/Interfaces";
-import { Label } from "@material-ui/icons";
-import { updateQuestion } from "../../api/api";
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & { children?: React.ReactElement<any, any> },
@@ -20,26 +17,30 @@ const Transition = React.forwardRef(function Transition(
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-interface AlertDialogSlideProps {
+interface EditDialogProps {
   open: boolean;
+  header: string;
   title: string;
-  question: string;
   id: number;
   onConfirm: any;
   onRefuse: any;
 }
-export default function AlertDialogSlide(props: AlertDialogSlideProps) {
-  const [question, setQuestion] = React.useState<string>("");
+export default function EditDialog(props: EditDialogProps) {
+  const [title, setTitle] = React.useState<string>("");
+  const [error, setError] = React.useState(false);
+
   React.useEffect(() => {
-    setQuestion(props.question);
-  }, [props.question]);
+    setTitle(props.title);
+  }, [props.title]);
 
   const onSubmit = async () => {
-    if (question == "") {
+    setError(false);
+    if (title == "") {
+      setError(true);
       //set error
       return;
     }
-    props.onConfirm(question);
+    props.onConfirm(title);
   };
   return (
     <div>
@@ -50,17 +51,18 @@ export default function AlertDialogSlide(props: AlertDialogSlideProps) {
         aria-labelledby="alert-dialog-slide-title"
         aria-describedby="alert-dialog-slide-description"
       >
-        <DialogTitle id="alert-dialog-slide-title">{props.title}</DialogTitle>
+        <DialogTitle id="alert-dialog-slide-title">{props.header}</DialogTitle>
 
         <DialogContent style={{ minWidth: 600 }}>
           <TextField
             autoFocus
+            error={error}
             InputLabelProps={{ shrink: true }}
             margin="dense"
-            label="Question"
+            label="Title"
             id="standard-helperText"
-            value={question}
-            onChange={(e) => setQuestion(e.currentTarget.value)}
+            value={title}
+            onChange={(e) => setTitle(e.currentTarget.value)}
             fullWidth
           />
         </DialogContent>

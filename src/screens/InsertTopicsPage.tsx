@@ -9,7 +9,7 @@ import {
   MenuItem,
   Select,
 } from "@material-ui/core";
-import { COLORS } from "../constants/Colors";
+import { COLORS } from "../constants/colors";
 import {
   createStyles,
   makeStyles,
@@ -22,8 +22,8 @@ import { addCategory, addTopic, getCategories } from "../api/api";
 import Alert from "@material-ui/lab/Alert";
 import { Category, Topic } from "../interfaces/Interfaces";
 import Chip from "@material-ui/core/Chip";
-import CustomAlert from "../components/CustomAlert";
-import CustomButton from "../components/CustomButton";
+import CustomAlert from "../components/alerts/CustomAlert";
+import CustomButton from "../components/buttons/CustomButton";
 const NO_CATEGORY = "Select A Category";
 
 const ITEM_HEIGHT = 48;
@@ -103,7 +103,7 @@ export default function InsertTopicsPage() {
       setError(true);
       return;
     }
-    const val = await addTopic(selectedCategories, topic, lang);
+    const val = false;
     if (val) {
       setAlert(true);
       setTimeout(() => setAlert(false), 3000);
@@ -117,10 +117,6 @@ export default function InsertTopicsPage() {
   const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setSelectedCategories(event.target.value as string[]);
   };
-
-  {
-    console.log(selectedCategories);
-  }
 
   return (
     <div

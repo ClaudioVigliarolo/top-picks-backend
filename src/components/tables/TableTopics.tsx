@@ -1,182 +1,241 @@
 import React from "react";
 import {
-  withStyles,
-  Theme,
-  createStyles,
-  makeStyles,
-} from "@material-ui/core/styles";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableContainer from "@material-ui/core/TableContainer";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
-import Paper from "@material-ui/core/Paper";
-import { FormControlLabel, MenuItem, Radio, Select } from "@material-ui/core";
+  CustomTable,
+  StyledEditCell,
+  StyledTableRow,
+  useStyles,
+  StyledTableCell,
+} from "./TableStyles";
 import {
-  EditItem,
-  Question,
   Category,
   Topic,
+  TopicCategory,
+  Related,
 } from "../../interfaces/Interfaces";
-import { useParams } from "react-router-dom";
-import {
-  addCategory,
-  getTopics,
-  removeQuestion,
-  updateQuestion,
-} from "../../api/api";
-import SearchIcon from "@material-ui/icons/Search";
+import { CONSTANTS } from "../../constants/constants";
+import { addTopic, deleteTopic, updateTopic } from "../../api/api";
+import DeleteDialog from "../dialogs/ConfirmDialog";
+import TopicAddDialog from "../dialogs/TopicDialog";
+import TopicEditDialog from "../dialogs/TopicDialog";
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
-import CloseIcon from "@material-ui/icons/Close";
-import DeleteDialog from "../dialogs/CustomDialog";
-import EditDialog from "../dialogs/EditDialog";
-import CustomAlert from "../CustomAlert";
-import { Alert } from "@material-ui/lab";
-import { COLORS } from "../../constants/Colors";
-import InputBase from "@material-ui/core/InputBase";
-import IconButton from "@material-ui/core/IconButton";
-import TopicAddDialog from "../dialogs/TopicAddDialog";
-import CustomButton from "../CustomButton";
-
-const StyledTableCell = withStyles((theme: Theme) =>
-  createStyles({
-    head: {
-      backgroundColor: "orange",
-      width: "100%",
-      color: theme.palette.common.white,
-    },
-    body: {
-      fontSize: 18,
-    },
-  })
-)(TableCell);
-
-const StyledEditCell = withStyles((theme: Theme) =>
-  createStyles({
-    head: {
-      backgroundColor: "orange",
-      width: "100%",
-      color: theme.palette.common.white,
-    },
-    body: {
-      fontSize: 14,
-      color: "black",
-      position: "relative",
-    },
-  })
-)(TableCell);
-
-const StyledTableRow = withStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      "&:nth-of-type(odd)": {
-        backgroundColor: theme.palette.action.hover,
-      },
-    },
-  })
-)(TableRow);
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    table: {
-      width: "85%",
-      alignSelf: "center",
-      backgroundColor: "white",
-    },
-    root: {
-      padding: "2px 4px",
-      display: "flex",
-      alignItems: "center",
-      width: 300,
-      backgroundColor: "white",
-    },
-    input: {
-      marginLeft: theme.spacing(1),
-      flex: 1,
-    },
-    iconButton: {
-      padding: 10,
-    },
-    divider: {
-      height: 28,
-      margin: 4,
-    },
-  })
-);
+import TransactionAlert from "../alerts/TransactionAlert";
+import { getFormattedDate, getHash } from "../../utils/utils";
+import SearchBar from "../filters/searchBar";
+import CustomButton from "../buttons/CustomButton";
 
 interface TableTopicsProps {
   topics: Topic[];
+  categories: Category[];
+  topicCategories: TopicCategory[];
+  related: Related[];
 }
 
 export default function TableTopics(props: TableTopicsProps) {
+  const [topics, setTopics] = React.useState<Topic[]>([]);
+  const [categories, setCategories] = React.useState<Category[]>([]);
+  const [topicCategories, setTopicCategories] = React.useState<TopicCategory[]>(
+    []
+  );
+  const [related, setRelated] = React.useState<Related[]>([]);
+  const [currentTopicRelated, setCurrentTopicRelated] = React.useState<
+    string[]
+  >([]);
   const [searchText, setSearchText] = React.useState<string>("");
+  const [topicAddDialog, setTopicAddDialog] = React.useState<boolean>(false);
+  const [currentTopicTitle, setCurrentTopicTitle] = React.useState<string>("");
+  const [editDialog, setEditDialog] = React.useState<boolean>(false);
   const [success, setSuccess] = React.useState(false);
   const [error, setError] = React.useState(false);
   const [deleteDialog, setDeleteDialog] = React.useState<boolean>(false);
-  const [topics, setTopics] = React.useState<Topic[]>([]);
-  const [topicAddDialog, setTopicAddDialog] = React.useState<boolean>(false);
-  const [editDialog, setEditDialog] = React.useState<boolean>(false);
   const [currentTopicId, setCurrentTopicId] = React.useState<number>(-1);
-  const [
-    currentTopicQuestion,
-    setCurrentTopicQuestion,
-  ] = React.useState<string>("");
-
-  React.useEffect(() => {
-    console.log("my topics", props.topics);
-    setTopics(props.topics);
-  }, [props.topics]);
-
   const classes = useStyles();
 
-  const onCategoryAdd = async (newCategory: string): Promise<void> => {};
+  React.useEffect(() => {
+    setTopics(props.topics);
+    setCategories(props.categories);
+    setRelated(props.related);
+    setTopicCategories(props.topicCategories);
+  }, [props.topics, props.categories, props.related, props.topicCategories]);
+
+  const onEdit = (id: number, title: string) => {
+    setCurrentTopicTitle(title);
+    setCurrentTopicId(id);
+    setCurrentTopicRelated([]);
+    setEditDialog(true);
+  };
+
+  const onDelete = (id: number) => {
+    setCurrentTopicId(id);
+    setDeleteDialog(true);
+  };
+
+  const renderRows = (topics: Topic[]) => {
+    return topics.map((topic: Topic) => {
+      if (topic.title.toLowerCase().includes(searchText.toLowerCase())) {
+        return (
+          <StyledTableRow>
+            <StyledTableCell> {topic.title}</StyledTableCell>
+            <StyledTableCell>{topic.source}</StyledTableCell>
+            <StyledTableCell>
+              {getFormattedDate(topic.timestamp)}
+            </StyledTableCell>
+            <StyledEditCell>
+              no related
+              <div className={classes.iconsContainer}>
+                <EditIcon
+                  className={classes.editIcon}
+                  onClick={() => {
+                    onEdit(topic.id, topic.title);
+                  }}
+                />
+                <DeleteIcon
+                  onClick={() => {
+                    onDelete(topic.id);
+                  }}
+                  className={classes.deleteIcon}
+                />
+              </div>
+            </StyledEditCell>
+          </StyledTableRow>
+        );
+      }
+    });
+  };
+
+  const onTopicUpdate = async (
+    topicTitle: string,
+    selectedCategoriesTitle: string[],
+    topicId: number
+  ): Promise<void> => {
+    const selectedCategoriesId: number[] = [];
+    selectedCategoriesTitle.forEach((title: string) => {
+      const category = categories.find(
+        (categ: Category) => categ.title == title
+      );
+      if (category) selectedCategoriesId.push(category.id);
+    });
+
+    const val = await updateTopic(
+      topicId,
+      topicTitle,
+      selectedCategoriesId,
+      "EN"
+    );
+    if (!val) {
+      setError(true);
+      setTimeout(() => setError(false), CONSTANTS.ALERT_TIME);
+      return;
+    }
+    //new topic updated successfully, update locally
+    const newTopics = topics;
+    const topicIndex = topics.findIndex((topic: Topic) => topic.id == topicId);
+    newTopics[topicIndex].title = topicTitle;
+    newTopics[topicIndex].timestamp = Date();
+
+    //new categories id, exluding the topic id
+    const newTopicCategories = topicCategories.filter(
+      (topicCateg: TopicCategory) => topicCateg.topic_id != topicId
+    );
+
+    selectedCategoriesId.forEach((id: number) => {
+      newTopicCategories.push({ category_id: id, topic_id: topicId });
+    });
+
+    //push new updated arrays
+    setTopics([...newTopics]);
+    setTopicCategories([...newTopicCategories]);
+
+    //newTopics.push({ title: topicTitle, id: categoryHash });
+    setSuccess(true);
+    setTimeout(() => setSuccess(false), CONSTANTS.ALERT_TIME);
+  };
+
+  const onTopicAdd = async (
+    topicTitle: string,
+    selectedCategoriesTitle: string[]
+  ): Promise<void> => {
+    const selectedCategoriesId: number[] = [];
+    selectedCategoriesTitle.forEach((title: string) => {
+      const category = categories.find(
+        (categ: Category) => categ.title == title
+      );
+      if (category) selectedCategoriesId.push(category.id);
+    });
+    const topicID = getHash(topicTitle);
+    const val = await addTopic(
+      topicID,
+      topicTitle,
+      "Top Picks Creator",
+      selectedCategoriesId,
+      "EN"
+    );
+    if (!val) {
+      setError(true);
+      setTimeout(() => setError(false), CONSTANTS.ALERT_TIME);
+      return;
+    }
+    //new topic added successfully, add locally
+    const newTopics = topics;
+    const newTopicCategories = topicCategories;
+
+    //update topic array
+    newTopics.unshift({
+      id: topicID,
+      source: "Top Picks Creator",
+      timestamp: Date(),
+      title: topicTitle,
+    });
+    //get categoriesId from selectedCategoriesTitle
+    selectedCategoriesId.forEach((id: number) => {
+      newTopicCategories.push({ category_id: id, topic_id: topicID });
+    });
+
+    //push new updated arrays
+    setTopics([...newTopics]);
+    setTopicCategories([...newTopicCategories]);
+
+    //newTopics.push({ title: topicTitle, id: categoryHash });
+    setSuccess(true);
+    setTimeout(() => setSuccess(false), CONSTANTS.ALERT_TIME);
+  };
+
+  const onTopicDelete = async (id: number): Promise<void> => {
+    const val = await deleteTopic(id, "EN");
+    if (!val) {
+      setError(true);
+      setTimeout(() => setError(false), CONSTANTS.ALERT_TIME);
+      return;
+    }
+    const newTopics = topics.filter((topic: Topic) => topic.id != id);
+    setTopics([...newTopics]);
+    setSuccess(true);
+    setTimeout(() => setSuccess(false), CONSTANTS.ALERT_TIME);
+  };
+
+  const getPreselectedCategories = (id: number) => {
+    const preselectedCategories: string[] = [];
+    topicCategories.forEach((topicCateg: TopicCategory) => {
+      if (topicCateg.topic_id == id) {
+        const preselectedCateg = categories.find(
+          (categ: Category) => categ.id == topicCateg.category_id
+        );
+
+        if (preselectedCateg)
+          preselectedCategories.push(preselectedCateg.title);
+      }
+    });
+    return preselectedCategories;
+  };
 
   return (
-    <TableContainer
-      component={Paper}
-      style={{
-        display: "flex",
-        alignItems: "center",
-        flexDirection: "column",
-        backgroundColor: COLORS.primaryBackground,
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          alignSelf: "center",
-          justifyContent: "space-between",
-          marginBottom: 100,
-          width: 700,
-          padding: 20,
-          borderRadius: 10,
-          borderWidth: 5,
-          borderColor: "transparent",
-          borderStyle: "solid",
-          //backgroundColor: "#ff981b",
-        }}
-      >
-        <Paper component="form" className={classes.root}>
-          <div>
-            <IconButton
-              type="submit"
-              className={classes.iconButton}
-              aria-label="search"
-            >
-              <SearchIcon />
-            </IconButton>
-            <InputBase
-              className={classes.input}
-              placeholder="Filter Topics"
-              value={searchText}
-              onChange={(e) => setSearchText(e.currentTarget.value)}
-              inputProps={{ "aria-label": "search google maps" }}
-            />
-          </div>
-        </Paper>
+    <>
+      <div className={classes.headerSection}>
+        <SearchBar
+          placeholder="Filter Topics"
+          setSearchText={(text) => setSearchText(text)}
+          searchText={searchText}
+        />
         <div>
           <CustomButton
             onClick={() => setTopicAddDialog(true)}
@@ -184,133 +243,59 @@ export default function TableTopics(props: TableTopicsProps) {
           />
         </div>
       </div>
+      <CustomTable
+        columns={["15%", "20%", "20%", "45%"]}
+        columnNames={["title", "source", "last update", "related"]}
+        body={renderRows(topics)}
+      />
 
-      <Table className={classes.table} aria-label="customized table">
-        <colgroup>
-          <col style={{ width: "25%" }} />
-          <col style={{ width: "25%" }} />
-          <col style={{ width: "50%" }} />
-        </colgroup>
+      <TopicEditDialog
+        open={editDialog}
+        preselectedCategories={getPreselectedCategories(currentTopicId)}
+        topic={currentTopicTitle}
+        categories={categories.map((categ) => categ.title)}
+        onConfirm={(topicTitle: string, selectedCategoriesTitle: string[]) => {
+          onTopicUpdate(topicTitle, selectedCategoriesTitle, currentTopicId);
+          setCurrentTopicId(-1);
+          setCurrentTopicTitle("");
+          setEditDialog(false);
+        }}
+        onRefuse={() => {
+          setCurrentTopicId(-1);
+          setCurrentTopicTitle("");
+          setEditDialog(false);
+        }}
+        headerText="Edit Topic"
+      />
 
-        <TableHead>
-          <TableRow
-            style={{
-              color: "#fff",
-              backgroundColor: COLORS.darkerOrange,
-            }}
-          >
-            <TableCell
-              style={{
-                color: "#fff",
-                fontSize: 16,
-                textTransform: "uppercase",
-              }}
-            >
-              title
-            </TableCell>
+      <TopicAddDialog
+        open={topicAddDialog}
+        preselectedCategories={[]}
+        categories={categories.map((categ) => categ.title)}
+        headerText="Add New Topic"
+        topic=""
+        onConfirm={(topicTitle: string, selectedCategoriesTitle: string[]) => {
+          onTopicAdd(topicTitle, selectedCategoriesTitle);
+          setTopicAddDialog(false);
+        }}
+        onRefuse={() => {
+          setTopicAddDialog(false);
+        }}
+      />
 
-            <TableCell
-              style={{
-                color: "#fff",
-                fontSize: 16,
-                textTransform: "uppercase",
-              }}
-            >
-              source
-            </TableCell>
-            <TableCell
-              style={{
-                color: "#fff",
-                fontSize: 16,
-                textTransform: "uppercase",
-              }}
-            >
-              related
-            </TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {topics.map((topic: Topic) => {
-            if (
-              topic.title &&
-              topic.title.toLowerCase().includes(searchText.toLowerCase())
-            ) {
-              return (
-                <StyledTableRow>
-                  <StyledTableCell> {topic.title}</StyledTableCell>
-                  <StyledTableCell>{topic.title}</StyledTableCell>
-                  <StyledEditCell>
-                    {topic.title}
-                    <div
-                      style={{
-                        position: "absolute",
-                        right: 30,
-                        color: "orange",
-                        top: "20%",
-                        cursor: "pointer",
-                        width: 80,
-                        display: "flex",
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <EditIcon
-                        style={{
-                          cursor: "pointer",
-                          color: COLORS.primaryOrange,
-                        }}
-                        onClick={() => {
-                          // report.question &&
-                          //   setCurrentReportQuestion(report.question);
-                          // setCurrentReportId(report.id);
-                          // setEditDialog(true);
-                        }}
-                      />
-                      <DeleteIcon
-                        onClick={() => {
-                          //setCurrentReportId(report.id);
-                          setDeleteDialog(true);
-                        }}
-                        style={{
-                          cursor: "pointer",
-                          color: COLORS.darkerOrange,
-                        }}
-                      />
-                    </div>
-                  </StyledEditCell>
-                </StyledTableRow>
-              );
-            }
-          })}
-        </TableBody>
-      </Table>
       <DeleteDialog
         open={deleteDialog}
-        onConfirm={() => {}}
+        onConfirm={() => {
+          onTopicDelete(currentTopicId);
+          setDeleteDialog(false);
+        }}
         title="Proceed to Delete the question?"
         description="The question record will be removed from the main database. You cannot undo this operation"
         onRefuse={() => {
           setDeleteDialog(false);
         }}
       />
-
-      <TopicAddDialog
-        open={topicAddDialog}
-        onConfirm={(topic: string) => {
-          setTopicAddDialog(false);
-          //onCategoryAdd(categ);
-        }}
-        onRefuse={() => {
-          setTopicAddDialog(false);
-        }}
-      />
-
-      <CustomAlert
-        visible={success}
-        text="Updated successfully!"
-        type="success"
-      />
-      <CustomAlert visible={error} text="Error adding topic" type="error" />
-    </TableContainer>
+      <TransactionAlert success={success} error={error} />
+    </>
   );
 }

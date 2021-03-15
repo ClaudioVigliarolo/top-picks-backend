@@ -1,10 +1,10 @@
 import React from "react";
 import Button from "@material-ui/core/Button";
-import { COLORS } from "../constants/Colors";
+import { COLORS } from "../constants/colors";
 import { Language, languages } from "../constants/languages";
 import { useHistory } from "react-router-dom";
 import { MenuItem, Select } from "@material-ui/core";
-import CustomButton from "../components/CustomButton";
+import CustomButton from "../components/buttons/CustomButton";
 
 const NO_LANG = "Select A Language";
 export default function StartPage() {

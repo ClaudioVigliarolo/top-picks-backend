@@ -3,30 +3,28 @@ import TableReports from "../components/tables/TableReports";
 import HeaderSection from "../components/HeaderSection";
 import Menu from "../components/Menu";
 
-import { COLORS } from "../constants/Colors";
+import { COLORS } from "../constants/colors";
 import { getCategories, getReports, getTopics, getQuestions } from "../api/api";
 import { useParams } from "react-router-dom";
 import { Category, Question, Report, Topic } from "../interfaces/Interfaces";
 import TableQuestions from "../components/tables/TableQuestions";
-const [questions, setQuestions] = React.useState<Question[]>([]);
 
 export default function TopicsPage() {
-  const { lang }: { lang: string } = useParams();
+  const [questions, setQuestions] = React.useState<Question[]>([]);
   const [topics, setTopics] = React.useState<Topic[]>([]);
 
   React.useEffect(() => {
     (async () => {
-      /*  const retrievedQuestions = await getQuestions(lang);
-        if (retrievedQuestions && Array.isArray(retrievedQuestions)) {
-          console.log(retrievedQuestions);
-          setQuestions(retrievedQuestions);
-        }*/
+      const retrievedQuestions = await getQuestions("EN");
+      if (retrievedQuestions != null) {
+        setQuestions(retrievedQuestions);
+      }
     })();
 
     (async () => {
       const retrievedTopics = await getTopics("EN");
-      if (retrievedTopics && Array.isArray(retrievedTopics)) {
-        setTopics(retrievedTopics);
+      if (retrievedTopics) {
+        setTopics(retrievedTopics.topics);
       }
     })();
   }, []);
@@ -41,7 +39,7 @@ export default function TopicsPage() {
         backgroundColor: COLORS.primaryBackground,
       }}
     >
-      <TableQuestions topics={topics} />
+      <TableQuestions questions={questions} topics={topics} />
     </div>
   );
 }

@@ -24,7 +24,7 @@ import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import InboxIcon from "@material-ui/icons/MoveToInbox";
 import MailIcon from "@material-ui/icons/Mail";
-import { COLORS } from "../constants/Colors";
+import { COLORS } from "../constants/colors";
 import InsertPage from "../screens/InsertPage";
 import InsertCategoriesPage from "../screens/InsertCategoriesPage";
 import { MenuItem, Select } from "@material-ui/core";
@@ -126,11 +126,9 @@ export default function PersistentDrawerLeft({ children }: { children: any }) {
 
   React.useEffect(() => {
     setPath(location.pathname);
-    console.log(location.pathname);
   }, [location, setPath]);
 
   const activetRoute = (route: string) => {
-    console.log(route, path);
     return route === path;
   };
 

@@ -3,25 +3,38 @@ import TableReports from "../components/tables/TableReports";
 import HeaderSection from "../components/HeaderSection";
 import Menu from "../components/Menu";
 
-import { COLORS } from "../constants/Colors";
-import { getReports, getTopics } from "../api/api";
+import { COLORS } from "../constants/colors";
+import { addReport, getReports, getTopics } from "../api/api";
 import { useParams } from "react-router-dom";
-import { Question, Report, Topic } from "../interfaces/Interfaces";
+import {
+  Question,
+  Report,
+  ReportHandled,
+  Topic,
+} from "../interfaces/Interfaces";
 export default function ViewPage() {
   const { lang }: { lang: string } = useParams();
-  const [reports, setReports] = React.useState<Report[]>([]);
+  const [reports, setReports] = React.useState<ReportHandled[]>([]);
   const [topics, setTopics] = React.useState<Topic[]>([]);
 
   React.useEffect(() => {
     (async () => {
+      const newReport: Report = {
+        question_id: 16728752,
+        reason: "no res",
+      };
+      //await addReport(newReport, "EN");
+    })();
+
+    (async () => {
       const reports = await getReports("EN");
-      setReports(reports);
+      if (reports) setReports(reports);
     })();
 
     (async () => {
       const retrievedTopics = await getTopics("EN");
-      if (retrievedTopics && Array.isArray(retrievedTopics)) {
-        setTopics(retrievedTopics);
+      if (retrievedTopics) {
+        setTopics(retrievedTopics.topics);
       }
     })();
   }, []);

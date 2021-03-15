@@ -1,22 +1,21 @@
 import axios from "axios";
-import {Category, Question, Report, Topic} from "../interfaces/Interfaces"
+import {Category, Question, Report, ReportHandled, RetrievedTopics, Topic} from "../interfaces/Interfaces"
 import {HOSTNAME} from "../config/config"
-export const getCategories = async (lang:string):Promise<Category[]> => {
+export const getCategories = async (lang:string):Promise<Category[]|null> => {
   try{
     let response = await axios
     .get(`${HOSTNAME}/topicks/categories/`+lang)
     .then((response) => {
-      console.log("prim",response.data)
       return response.data;
     })
     return response;
   } catch(err){
       console.error(err);
   }
-  return []
+  return null;
 }
 
-export const getTopics = async (lang:string):Promise<Topic[]> => {
+export const getTopics = async (lang:string):Promise<RetrievedTopics|null> => {
   try{
     let response = await axios
     .get(`${HOSTNAME}/topicks/topics/`+lang)
@@ -27,15 +26,17 @@ export const getTopics = async (lang:string):Promise<Topic[]> => {
   } catch(err){
       console.error(err);
   }
-  return []
+  return null;
 }
 
-export const addTopic = async (categories:string[], newTopic:string, lang:string):Promise<boolean> => {
+export const addTopic = async ( id: number, title:string, source: string, categoriesId:number[], lang:string):Promise<boolean> => {
   try{
     let response = await  axios
     .post(`${HOSTNAME}/topicks/add_topic`, {
-      categories,
-      topic:newTopic,
+      id,
+      categoriesId,
+      title,
+      source,
       lang
     });
       return response.status == 200;
@@ -45,27 +46,13 @@ export const addTopic = async (categories:string[], newTopic:string, lang:string
   }
 }
 
-export const addQuestions = async (questions:string[], topic:string, lang:string):Promise<boolean> => {
+export const updateTopic = async (id:number, title:string,  categoriesId:number[], lang:string):Promise<boolean> => {
   try{
     let response = await  axios
-    .post(`${HOSTNAME}/topicks/add_questions`, {
-      questions,
-      topic,
-      lang
-    });
-    console.log("stttt", response)
-      return response.status == 200;
-  } catch(err){
-    console.log(err)
-      return false;
-  }
-}
-
-export const addCategory = async (newCateg:string, lang:string):Promise<boolean> => {
-  try{
-    let response = await  axios
-    .post(`${HOSTNAME}/topicks/add_category`, {
-      category: newCateg,
+    .put(`${HOSTNAME}/topicks/update_topic`, {
+      id,
+      title,
+      categoriesId,
       lang
     });
     return response.status == 200;
@@ -74,6 +61,89 @@ export const addCategory = async (newCateg:string, lang:string):Promise<boolean>
       return false;
   }
 }
+
+export const deleteTopic = async (id:number, lang:string):Promise<boolean> => {
+  try{
+    let response = await  axios
+    .delete(`${HOSTNAME}/topicks/delete_topic`, {
+      data:{
+        id,
+        lang
+      }
+    });
+      return response.status == 200;
+  } catch(err){
+    console.log(err)
+      return false;
+  }
+}
+
+export const deleteCategory = async (id:number, lang:string):Promise<boolean> => {
+  try{
+    let response = await  axios
+    .delete(`${HOSTNAME}/topicks/delete_category`, {
+      data:{
+        id,
+        lang
+      }
+    });
+      return response.status == 200;
+  } catch(err){
+    console.log(err)
+      return false;
+  }
+}
+
+
+
+export const addQuestions = async (questions:Question[], lang:string):Promise<boolean> => {
+  try{
+    let response = await  axios
+    .post(`${HOSTNAME}/topicks/add_questions`, {
+      questions,
+      lang
+    });
+      return response.status == 200;
+  } catch(err){
+    console.log(err)
+      return false;
+  }
+}
+
+
+//updateCategory
+export const addCategory = async (title:string, id:number, lang:string):Promise<boolean> => {
+  try{
+    let response = await  axios
+    .post(`${HOSTNAME}/topicks/add_category`, {
+      title,
+      id,
+      lang
+    });
+    return response.status == 200;
+  } catch(err){
+    console.log(err)
+      return false;
+  }
+}
+
+export const updateCategory = async (title:string, id:number, lang:string):Promise<boolean> => {
+  try{
+    let response = await  axios
+    .put(`${HOSTNAME}/topicks/update_category`, {
+      title,
+      id,
+      lang
+    });
+    return response.status == 200;
+  } catch(err){
+    console.log(err)
+      return false;
+  }
+}
+
+
+
 
 export const getUpdates = async (date:string, lang:string):Promise<Topic[]> => {
   try{
@@ -88,7 +158,7 @@ export const getUpdates = async (date:string, lang:string):Promise<Topic[]> => {
       console.error(err);
   }
   return []
-}
+} 
 
 
 export const addReport = async (report:Report, lang:string):Promise<boolean> => {
@@ -105,12 +175,13 @@ export const addReport = async (report:Report, lang:string):Promise<boolean> => 
   }
 }
 
-export const updateQuestion = async (id:number, question:string, lang:string):Promise<boolean> => {
+export const updateQuestion = async (id:number, title:string, topicId:number, lang:string):Promise<boolean> => {
   try{
     let response = await  axios
     .put(`${HOSTNAME}/topicks/update_question`, {
       id,
-      question,
+      title,
+      topicId,
       lang
     });
       return response.status == 200;
@@ -120,7 +191,7 @@ export const updateQuestion = async (id:number, question:string, lang:string):Pr
   }
 }
  
-export const removeReport = async (id:number, lang:string):Promise<boolean> => {
+export const deleteReport = async (id:number, lang:string):Promise<boolean> => {
   try{
     let response = await  axios
     .delete(`${HOSTNAME}/topicks/delete_report`, {
@@ -137,7 +208,7 @@ export const removeReport = async (id:number, lang:string):Promise<boolean> => {
 }
 
 
-export const removeQuestion = async (id:number, lang:string):Promise<boolean> => {
+export const deleteQuestion = async (id:number, lang:string):Promise<boolean> => {
   try{
     let response = await  axios
     .delete(`${HOSTNAME}/topicks/delete_question`, {
@@ -155,7 +226,7 @@ export const removeQuestion = async (id:number, lang:string):Promise<boolean> =>
 
 
 
-export const getReports = async (lang:string):Promise<Report[]> => {
+export const getReports = async (lang:string):Promise<ReportHandled[]|null> => {
   try{
     let response = await axios
     .get(`${HOSTNAME}/topicks/get_reports/${lang}`)
@@ -167,7 +238,22 @@ export const getReports = async (lang:string):Promise<Report[]> => {
   } catch(err){
       console.error(err);
   }
-  return []
+  return null;
 }
 
+
+export const getQuestions = async (lang:string):Promise<Question[]| null> => {
+  try{
+    let response = await axios
+    .get(`${HOSTNAME}/topicks/get_questions/${lang}`)
+    .then((response) => {
+      return response.data;
+    })
+    return response;
+  } catch(err){
+      console.error(err);
+  }
+  return null;
+
+}
 
