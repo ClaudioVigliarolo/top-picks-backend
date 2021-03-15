@@ -1,31 +1,13 @@
 import React from "react";
+import { getReports, getTopics } from "../api/api";
 import TableReports from "../components/tables/TableReports";
-import HeaderSection from "../components/HeaderSection";
-import Menu from "../components/Menu";
-
 import { COLORS } from "../constants/colors";
-import { addReport, getReports, getTopics } from "../api/api";
-import { useParams } from "react-router-dom";
-import {
-  Question,
-  Report,
-  ReportHandled,
-  Topic,
-} from "../interfaces/Interfaces";
+import { Report, ReportHandled, Topic } from "../interfaces/Interfaces";
 export default function ViewPage() {
-  const { lang }: { lang: string } = useParams();
   const [reports, setReports] = React.useState<ReportHandled[]>([]);
   const [topics, setTopics] = React.useState<Topic[]>([]);
 
   React.useEffect(() => {
-    (async () => {
-      const newReport: Report = {
-        question_id: 16728752,
-        reason: "no res",
-      };
-      //await addReport(newReport, "EN");
-    })();
-
     (async () => {
       const reports = await getReports("EN");
       if (reports) setReports(reports);
