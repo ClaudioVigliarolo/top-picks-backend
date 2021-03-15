@@ -14,7 +14,7 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
-import { COLORS } from "../../constants/colors";
+import { COLORS } from "../../constants/Colors";
 
 interface CommonStylesProps {
   body: any;

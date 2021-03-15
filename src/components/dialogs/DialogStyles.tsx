@@ -7,7 +7,7 @@ import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import Slide from "@material-ui/core/Slide";
 import { TransitionProps } from "@material-ui/core/transitions";
-import { COLORS } from "../../constants/colors";
+import { COLORS } from "../../constants/Colors";
 import { TextField } from "@material-ui/core";
 import { Alert } from "@material-ui/lab";
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { COLORS } from "../constants/colors";
+import { COLORS } from "../constants/Colors";
 import { Category, Question, Report, Topic } from "../interfaces/Interfaces";
 import TableQuestions from "../components/tables/TableQuestions";
 import { getQuestions, getTopics } from "../api/api";

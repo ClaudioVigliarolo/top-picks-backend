@@ -18,7 +18,7 @@ import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
-import { COLORS } from "../constants/colors";
+import { COLORS } from "../constants/Colors";
 import { MenuItem, Select } from "@material-ui/core";
 
 import HeaderSection from "./HeaderSection";

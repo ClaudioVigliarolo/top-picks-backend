@@ -1,5 +1,9 @@
 //used to store the last update time in db
 const store = require('store')
+const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
+
+
 const LAST_UPDATE_KEY="LAST_UPDATE_KEY";
 
  const getCurrentTime=()=>{
@@ -16,6 +20,7 @@ const LAST_UPDATE_KEY="LAST_UPDATE_KEY";
 }
 
 
+
    const getHash=(str)=> {
     var hash = 0, i, chr;
     for (i = 0; i < str.length; i++) {
@@ -26,5 +31,10 @@ const LAST_UPDATE_KEY="LAST_UPDATE_KEY";
     return hash;
   }
 
-  module.exports ={ getHash,getLastUpdateDate, setLastUpdateDate }
+
+const generateAuthToken=(_id)=>{
+  const token = jwt.sign({ _id }, config.JWT_CODE)
+  return token;
+  }
+
   
