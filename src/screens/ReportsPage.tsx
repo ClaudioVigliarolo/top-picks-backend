@@ -1,9 +1,9 @@
 import React from "react";
 import { getReports, getTopics } from "../api/api";
 import TableReports from "../components/tables/TableReports";
-import { COLORS } from "../constants/colors";
+//import { COLORS } from "../constants/colors";
 import { Report, ReportHandled, Topic } from "../interfaces/Interfaces";
-export default function ViewPage() {
+export default function ReportsPage() {
   const [reports, setReports] = React.useState<ReportHandled[]>([]);
   const [topics, setTopics] = React.useState<Topic[]>([]);
 
@@ -28,7 +28,7 @@ export default function ViewPage() {
         width: "100%",
         minHeight: "100vh",
         flexDirection: "column",
-        backgroundColor: COLORS.primaryBackground,
+        backgroundColor: "orange",
       }}
     >
       <TableReports reports={reports} topics={topics} />
