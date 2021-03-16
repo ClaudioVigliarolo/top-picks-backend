@@ -45,21 +45,11 @@ export default function TopicsPage() {
   }, []);
 
   return (
-    <div
-      style={{
-        display: "flex",
-        width: "100%",
-        minHeight: "100vh",
-        flexDirection: "column",
-        backgroundColor: COLORS.primaryBackground,
-      }}
-    >
-      <TableTopics
-        topics={topics}
-        categories={categories}
-        topicCategories={topicCategories}
-        related={related}
-      />
-    </div>
+    <TableTopics
+      topics={topics}
+      categories={categories}
+      topicCategories={topicCategories}
+      related={related}
+    />
   );
 }

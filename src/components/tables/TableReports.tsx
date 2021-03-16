@@ -44,8 +44,8 @@ export default function TableCategories(props: TableReportsProps) {
 
   const classes = useStyles();
 
-  const handleTopicChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setTopic(event.target.value as string);
+  const handleTopicChange = (event: React.ChangeEvent<{ value: string }>) => {
+    setTopic(event.target.value);
   };
 
   const getTopicIdByTitle = (topicTitle: string): number => {

@@ -48,8 +48,8 @@ const useStyles = makeStyles((theme: Theme) =>
       display: "flex",
       alignItems: "center",
       flexDirection: "column",
-      width: "100%",
       minHeight: "100vh",
+      width: "100%",
     },
     paper: {
       background: "red",
@@ -66,6 +66,20 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 const routers = [
+  {
+    key: "login",
+    path: "/login",
+    sidebarName: "login",
+    navbarName: "login",
+  },
+
+  {
+    key: "register",
+    path: "/register",
+    sidebarName: "register",
+    navbarName: "register",
+  },
+
   {
     key: "categories",
     path: "/insert/categories/:lang",
@@ -100,8 +114,8 @@ export default function PersistentDrawerLeft({ children }: { children: any }) {
   const [path, setPath] = React.useState("");
   const [language, setLanguage] = React.useState<string>("EN");
 
-  const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setLanguage(event.target.value as string);
+  const handleChange = (event: React.ChangeEvent<{ value: string }>) => {
+    setLanguage(event.target.value);
   };
 
   let location = useLocation();

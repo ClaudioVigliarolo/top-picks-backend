@@ -17,17 +17,5 @@ export default function ViewPage() {
     })();
   }, []);
 
-  return (
-    <div
-      style={{
-        display: "flex",
-        width: "100%",
-        minHeight: "100vh",
-        flexDirection: "column",
-        backgroundColor: COLORS.primaryBackground,
-      }}
-    >
-      <TableCategories categories={categories} />
-    </div>
-  );
+  return <TableCategories categories={categories} />;
 }

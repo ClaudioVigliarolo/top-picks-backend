@@ -24,17 +24,5 @@ export default function TopicsPage() {
     })();
   }, []);
 
-  return (
-    <div
-      style={{
-        display: "flex",
-        width: "100%",
-        minHeight: "100vh",
-        flexDirection: "column",
-        backgroundColor: COLORS.primaryBackground,
-      }}
-    >
-      <TableQuestions questions={questions} topics={topics} />
-    </div>
-  );
+  return <TableQuestions questions={questions} topics={topics} />;
 }

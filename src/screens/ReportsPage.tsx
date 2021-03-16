@@ -21,17 +21,5 @@ export default function ReportsPage() {
     })();
   }, []);
 
-  return (
-    <div
-      style={{
-        display: "flex",
-        width: "100%",
-        minHeight: "100vh",
-        flexDirection: "column",
-        backgroundColor: "orange",
-      }}
-    >
-      <TableReports reports={reports} topics={topics} />
-    </div>
-  );
+  return <TableReports reports={reports} topics={topics} />;
 }

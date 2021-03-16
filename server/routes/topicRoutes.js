@@ -2,14 +2,16 @@
 const express = require('express')
 
 // Import books-controller
-const controllers = require('../controllers/controllers.js')
+const controllers = require('../controllers/topicControllers.js')
+
+const auth = require('../middlewares/auth');
 
 // Create router
 const router = express.Router()
 
-router.get('/categories/:lang', controllers.categoriesAll)
+router.get('/categories/:lang', auth, controllers.categoriesAll)
  
-router.get('/topics/:lang', controllers.topicsAll)
+router.get('/topics/:lang', auth, controllers.topicsAll)
 
 router.get('/get_updates/:date/:lang', controllers.getUpdates)
 

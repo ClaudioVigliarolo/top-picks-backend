@@ -78,9 +78,9 @@ export default function CustomChip(props: CustomChipProps) {
           value={props.selectedValues}
           onChange={props.handleChange}
           input={<Input id="select-multiple-chip" />}
-          renderValue={(selected) => (
+          renderValue={(selected: any) => (
             <div className={classes.chips}>
-              {(selected as string[]).map((val) => (
+              {selected.map((val: any) => (
                 <Chip key={val} label={val} className={classes.chip} />
               ))}
             </div>

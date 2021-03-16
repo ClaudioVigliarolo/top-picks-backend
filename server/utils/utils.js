@@ -3,38 +3,49 @@ const store = require('store')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 
+const knex = require('../db');
 
-const LAST_UPDATE_KEY="LAST_UPDATE_KEY";
 
- const getCurrentTime=()=>{
+ const LAST_UPDATE_KEY="LAST_UPDATE_KEY";
+
+  const getCurrentTime=()=>{
   return new Date().toISOString().slice(0,10);
   }
 
- const getLastUpdateDate=()=>{
+  const getLastUpdateDate=()=>{
    return store.get(LAST_UPDATE_KEY);
  }
 
 
- const setLastUpdateDate=()=>{
+  const setLastUpdateDate=()=>{
   store.set(LAST_UPDATE_KEY, getCurrentTime())
 }
 
-
-
-   const getHash=(str)=> {
-    var hash = 0, i, chr;
-    for (i = 0; i < str.length; i++) {
-      chr   = str.charCodeAt(i);
-      hash  = ((hash << 5) - hash) + chr;
-      hash |= 0; // Convert to 32bit integer
-    }
-    return hash;
-  }
-
-
-const generateAuthToken=(_id)=>{
+  const generateAuthToken=(_id)=>{
   const token = jwt.sign({ _id }, config.JWT_CODE)
   return token;
   }
+
+
+  const decodeAuthToken=(token)=>{
+   const decodedToken = jwt.verify(token, config.JWT_CODE);
+    return decodedToken;
+    }
+  
+  
+
+  const isUserConnected=async (id,token)=>{
+  knex('tokens') 
+  .select('1')
+    .where({id, token})
+      .then(()=>{
+        //exist ok
+        return true;
+    })
+    .catch(err => {
+        return false;
+    })
+} 
+  
 
   

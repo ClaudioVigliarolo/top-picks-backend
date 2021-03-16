@@ -257,3 +257,23 @@ export const getQuestions = async (lang:string):Promise<Question[]| null> => {
 
 }
 
+
+
+
+export const login = async (username:string, password:string):Promise<boolean> => {
+  try{
+    let response = await  axios
+    .post(`${HOSTNAME}/login`, {
+      data:{
+        username,
+        password
+    }
+    });
+   
+      return response.status == 200;
+  } catch(err){
+    console.log(err)
+      return false;
+  }
+}
+

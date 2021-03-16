@@ -33,8 +33,8 @@ export default function QuestionDialog(props: QuestionDialogProps) {
     props.onConfirm(newQuestion, newTopic);
   };
 
-  const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setTopic(event.target.value as string);
+  const handleChange = (event: React.ChangeEvent<{ value: string }>) => {
+    setTopic(event.target.value);
   };
 
   return (

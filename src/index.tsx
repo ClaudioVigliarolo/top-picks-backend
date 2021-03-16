@@ -1,7 +1,13 @@
 // Import deps
 import React from "react";
 import { render } from "react-dom";
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link,
+  Redirect,
+} from "react-router-dom";
 import { HashRouter } from "react-router-dom";
 
 // Import components
@@ -9,6 +15,7 @@ import ReportsPage from "./screens/ReportsPage";
 import CategoriesPage from "./screens/CategoriesPage";
 import TopicsPage from "./screens/TopicsPage";
 import QuestionsPage from "./screens/QuestionsPage";
+import LoginPage from "./screens/LoginPage";
 
 // Import styles
 import "./styles/styles.css";
@@ -22,6 +29,10 @@ render(
     <Menu
       children={
         <Switch>
+          <Route exact path="/" render={() => <Redirect to="/login" />} />
+          <Route path="/login">
+            <LoginPage />
+          </Route>
           <Route path="/insert/categories/:lang">
             <CategoriesPage />
           </Route>

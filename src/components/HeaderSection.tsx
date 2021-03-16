@@ -21,3 +21,4 @@ export default function HeaderSection({ title }: { title: string }) {
     </div>
   );
 }
+/*COLORS.primaryBackground*/

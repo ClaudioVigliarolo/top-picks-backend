@@ -13,11 +13,10 @@ export default function CustomAlert({
   return (
     <div
       style={{
-        position: "absolute",
         display: visible ? "flex" : "none",
-        bottom: "2%",
-        left: "50%",
-        transform: "translate(-50%, -50%)",
+        alignSelf: "center",
+        position: "absolute",
+        bottom: 50,
       }}
     >
       <Alert severity={type} variant="filled">

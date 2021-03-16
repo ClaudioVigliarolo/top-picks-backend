@@ -34,8 +34,8 @@ export default function TopicDialog(props: TopicDialogProps) {
     props.onConfirm(newTopic, selectedCategories);
   };
 
-  const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setSelectedCategories(event.target.value as string[]);
+  const handleChange = (event: React.ChangeEvent<{ value: string[] }>) => {
+    setSelectedCategories(event.target.value);
   };
 
   return (
