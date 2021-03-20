@@ -49,7 +49,7 @@ export default function TopicDialog(props: TopicDialogProps) {
             width={500}
             selectedValues={selectedCategories}
             values={categories}
-            defaultValue="selll"
+            header="Topics"
             error={error}
             handleChange={handleChange}
           />

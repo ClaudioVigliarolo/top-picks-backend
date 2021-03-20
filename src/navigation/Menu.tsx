@@ -1,11 +1,5 @@
 import React from "react";
-import clsx from "clsx";
-import {
-  makeStyles,
-  useTheme,
-  Theme,
-  createStyles,
-} from "@material-ui/core/styles";
+import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
 import Drawer from "@material-ui/core/Drawer";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import AppBar from "@material-ui/core/AppBar";
@@ -21,7 +15,9 @@ import ListItemText from "@material-ui/core/ListItemText";
 import { COLORS } from "../constants/Colors";
 import { MenuItem, Select } from "@material-ui/core";
 
-import HeaderSection from "./HeaderSection";
+import HeaderSection from "../components/layout/HeaderSection";
+import { getCondition } from "./Index";
+import { logoutUser } from "../api/api";
 const drawerWidth = 240;
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -74,6 +70,13 @@ const routers = [
   },
 
   {
+    key: "registration",
+    path: "/registration",
+    sidebarName: "registration",
+    navbarName: "registration",
+  },
+
+  {
     key: "register",
     path: "/register",
     sidebarName: "register",
@@ -107,10 +110,20 @@ const routers = [
 ];
 const NO_LANG = "Select A Language";
 
-export default function PersistentDrawerLeft({ children }: { children: any }) {
+export default function PersistentDrawerLeft({
+  children,
+  userType,
+  isAuthenticated,
+  token,
+  username,
+}: {
+  children: any;
+  userType: string;
+  isAuthenticated: boolean;
+  token: string;
+  username: string;
+}) {
   const classes = useStyles();
-  const theme = useTheme();
-  const [open, setOpen] = React.useState(false);
   const [path, setPath] = React.useState("");
   const [language, setLanguage] = React.useState<string>("EN");
 
@@ -119,12 +132,9 @@ export default function PersistentDrawerLeft({ children }: { children: any }) {
   };
 
   let location = useLocation();
-  const handleDrawerOpen = () => {
-    setOpen(true);
-  };
 
-  const handleDrawerClose = () => {
-    setOpen(false);
+  const refreshPage = () => {
+    window.location.reload();
   };
 
   React.useEffect(() => {
@@ -172,36 +182,43 @@ export default function PersistentDrawerLeft({ children }: { children: any }) {
         <Divider />
 
         <List>
-          {routers.map((prop: any, key: number) => (
-            <Link to={prop.path} style={{ textDecoration: "none" }} key={key}>
-              <MenuItem selected={activetRoute(prop.path)}>
-                <ListItemText
-                  className={classes.drawerItem}
-                  primary={prop.sidebarName}
-                />
-              </MenuItem>
-            </Link>
-          ))}
+          {routers.map(
+            (prop: any, key: number) =>
+              getCondition(userType, prop.path, isAuthenticated) && (
+                <Link
+                  to={prop.path}
+                  style={{ textDecoration: "none" }}
+                  key={key}
+                >
+                  <MenuItem selected={activetRoute(prop.path)}>
+                    <ListItemText
+                      className={classes.drawerItem}
+                      primary={prop.sidebarName}
+                    />
+                  </MenuItem>
+                </Link>
+              )
+          )}
         </List>
         <Divider />
 
-        {/*    <List>
-          <Link to={"/reports" + language} style={{ textDecoration: "none" }}>
-            <MenuItem selected={activetRoute("/reports" + language)}>
-              <ListItemText className={classes.drawerItem} primary="reports" />
-            </MenuItem>
-          </Link>
-    </List>}*/}
-
         <Divider />
         <List>
-          <ListItem button>
-            <ListItemIcon>
-              <ExitToAppIcon style={{ color: COLORS.menuIcon }} />
-            </ListItemIcon>
-
-            <ListItemText primary="logout" className={classes.drawerItem} />
-          </ListItem>
+          {isAuthenticated && (
+            <ListItem
+              button
+              onClick={() => {
+                logoutUser(token);
+                refreshPage();
+              }}
+            >
+              <ListItemIcon>
+                <ExitToAppIcon style={{ color: COLORS.menuIcon }} />
+              </ListItemIcon>
+              (
+              <ListItemText primary="logout" className={classes.drawerItem} />)
+            </ListItem>
+          )}
         </List>
       </Drawer>
 

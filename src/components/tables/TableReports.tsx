@@ -20,6 +20,7 @@ import SearchBar from "../filters/searchBar";
 interface TableReportsProps {
   reports: ReportHandled[];
   topics: Topic[];
+  token: string;
 }
 
 const NO_TOPIC = "Filter by topic";
@@ -59,10 +60,16 @@ export default function TableCategories(props: TableReportsProps) {
     newQuestion: string
   ) => {
     //1 delete report
-    const val1 = await deleteReport(id, "EN");
+    const val1 = await deleteReport(id, "EN", props.token);
 
     //2 update the question with new content
-    const val2 = await updateQuestion(id, newQuestion, topicId, "EN");
+    const val2 = await updateQuestion(
+      id,
+      newQuestion,
+      topicId,
+      "EN",
+      props.token
+    );
 
     if (!val1 || !val2) {
       setError(true);
@@ -88,10 +95,10 @@ export default function TableCategories(props: TableReportsProps) {
 
   const onQuestionDelete = async (id: number) => {
     //1 delete report
-    const val1 = await deleteReport(id, "EN");
+    const val1 = await deleteReport(id, "EN", props.token);
 
     //2 delete the question
-    const val2 = await deleteQuestion(id, "EN");
+    const val2 = await deleteQuestion(id, "EN", props.token);
 
     if (!val1 || !val2) {
       setError(true);
@@ -111,7 +118,7 @@ export default function TableCategories(props: TableReportsProps) {
   };
 
   const onReportDelete = async (id: number) => {
-    const val = await deleteReport(id, "EN");
+    const val = await deleteReport(id, "EN", props.token);
 
     if (!val) {
       setError(true);

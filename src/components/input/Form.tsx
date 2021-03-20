@@ -7,7 +7,6 @@ const useStyles = makeStyles((theme) => ({
     "& > *": {
       margin: theme.spacing(5),
       width: "60ch",
-      height: "40ch",
       padding: 50,
       backgroundColor: "white",
       borderRadius: 5,
@@ -34,6 +33,8 @@ export default function BasicTextFields({
   password,
   onSubmit,
   error,
+  height,
+  children,
 }: {
   username: string;
   onChangeUsername: (newVal: string) => void;
@@ -41,12 +42,14 @@ export default function BasicTextFields({
   password: string;
   onSubmit: () => void;
   error: boolean;
+  height: string;
+  children?: any;
 }) {
   const classes = useStyles();
 
   return (
     <form className={classes.root} noValidate autoComplete="off">
-      <div className={classes.container}>
+      <div className={classes.container} style={{ height }}>
         <TextField
           onChange={(e) => onChangeUsername(e.currentTarget.value)}
           id="standard-basic"
@@ -64,6 +67,7 @@ export default function BasicTextFields({
           className={classes.textField}
           error={error}
         />
+        {children}
         <div className={classes.button}>
           <CustomButton onClick={onSubmit} title="Submit" />
         </div>

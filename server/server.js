@@ -12,6 +12,8 @@ const { PORT } = require('../config/config');
 // Import routes
 const topicsRoutes = require('./routes/topicRoutes')
 
+const authRoutes = require('./routes/authRoutes')
+
 
 // Create express app
 const app = express()
@@ -29,6 +31,7 @@ app.use(morgan('dev'));
 app.use(express.static(__dirname + '/public'));
 app.use(express.static(path.join(__dirname, '..', 'server', 'build')));
 
+app.use('/', authRoutes)
 app.use('/topicks', topicsRoutes)
 
 // Implement 500 error route

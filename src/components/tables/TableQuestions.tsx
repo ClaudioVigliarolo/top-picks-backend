@@ -22,6 +22,7 @@ import TransactionAlert from "../alerts/TransactionAlert";
 interface TableQuestionsProps {
   questions: Question[];
   topics: Topic[];
+  token: string;
 }
 
 export default function TableQuestions(props: TableQuestionsProps) {
@@ -60,7 +61,7 @@ export default function TableQuestions(props: TableQuestionsProps) {
       topic_id: topicId,
       timestamp: Date(),
     };
-    const val = await addQuestions([newQuestion], "EN");
+    const val = await addQuestions([newQuestion], "EN", props.token);
     const newQuestions = questions;
 
     if (!val) {
@@ -76,7 +77,7 @@ export default function TableQuestions(props: TableQuestionsProps) {
   };
 
   const onQuestionDelete = async (id: number): Promise<void> => {
-    const val = await deleteQuestion(id, "EN");
+    const val = await deleteQuestion(id, "EN", props.token);
     if (!val) {
       setError(true);
       setTimeout(() => setError(false), CONSTANTS.ALERT_TIME);
@@ -92,7 +93,7 @@ export default function TableQuestions(props: TableQuestionsProps) {
     newTitle: string,
     topicId: number
   ): Promise<void> => {
-    const val = await updateQuestion(id, newTitle, topicId, "EN");
+    const val = await updateQuestion(id, newTitle, topicId, "EN", props.token);
     if (!val) {
       setError(true);
       setTimeout(() => setError(false), CONSTANTS.ALERT_TIME);

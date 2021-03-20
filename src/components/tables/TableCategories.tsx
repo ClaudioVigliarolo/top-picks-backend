@@ -20,6 +20,7 @@ import TransactionAlert from "../alerts/TransactionAlert";
 
 interface TableCategoriesProps {
   categories: Category[];
+  token: string;
 }
 
 export default function TableCategories(props: TableCategoriesProps) {
@@ -46,7 +47,7 @@ export default function TableCategories(props: TableCategoriesProps) {
 
   const onCategoryAdd = async (newTitle: string): Promise<void> => {
     const categoryHash = getHash(newTitle);
-    const val = await addCategory(newTitle, categoryHash, "EN");
+    const val = await addCategory(newTitle, categoryHash, "EN", props.token);
     const newCategories = categories;
     if (!val) {
       setError(true);
@@ -61,7 +62,7 @@ export default function TableCategories(props: TableCategoriesProps) {
   };
 
   const onCategoryDelete = async (id: number): Promise<void> => {
-    const val = await deleteCategory(id, "EN");
+    const val = await deleteCategory(id, "EN", props.token);
     if (!val) {
       setError(true);
       setTimeout(() => setError(false), CONSTANTS.ALERT_TIME);
@@ -79,7 +80,7 @@ export default function TableCategories(props: TableCategoriesProps) {
     id: number,
     newTitle: string
   ): Promise<void> => {
-    const val = await updateCategory(newTitle, id, "EN");
+    const val = await updateCategory(newTitle, id, "EN", props.token);
     if (!val) {
       setError(true);
       setTimeout(() => setError(false), CONSTANTS.ALERT_TIME);

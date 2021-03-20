@@ -17,11 +17,11 @@ import {
 
 interface CustomChipProps {
   handleChange: any;
-  defaultValue: string;
   values: string[];
   error: boolean;
   width: number;
   selectedValues: string[];
+  header: string;
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -44,9 +44,6 @@ const useStyles = makeStyles((theme: Theme) =>
       backgroundColor: "orange",
       color: "white",
     },
-    noLabel: {
-      marginTop: theme.spacing(3),
-    },
   })
 );
 
@@ -68,7 +65,7 @@ export default function CustomChip(props: CustomChipProps) {
   return (
     <>
       <FormControl className={classes.formControl}>
-        <InputLabel id="demo-mutiple-chip-label">Categories</InputLabel>
+        <InputLabel id="demo-mutiple-chip-label">{props.header}</InputLabel>
         <Select
           labelId="demo-mutiple-chip-label"
           id="demo-mutiple-chip"

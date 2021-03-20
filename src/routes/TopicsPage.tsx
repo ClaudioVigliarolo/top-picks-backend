@@ -1,9 +1,4 @@
 import React from "react";
-import TableReports from "../components/tables/TableReports";
-import HeaderSection from "../components/HeaderSection";
-import Menu from "../components/Menu";
-
-import { COLORS } from "../constants/Colors";
 import { getCategories, getTopics } from "../api/api";
 import { useParams } from "react-router-dom";
 import {
@@ -14,10 +9,11 @@ import {
   Report,
   RetrievedTopics,
   Topic,
+  ComponentType,
 } from "../interfaces/Interfaces";
 import TableTopics from "../components/tables/TableTopics";
 
-export default function TopicsPage() {
+export default function TopicsPage({ token }: ComponentType) {
   const { lang }: { lang: string } = useParams();
   const [topics, setTopics] = React.useState<Topic[]>([]);
   const [topicCategories, setTopicCategories] = React.useState<TopicCategory[]>(
@@ -28,7 +24,7 @@ export default function TopicsPage() {
 
   React.useEffect(() => {
     (async () => {
-      const retrievedTopics = await getTopics("EN");
+      const retrievedTopics = await getTopics("EN", token);
       if (retrievedTopics != null) {
         setTopics(retrievedTopics.topics);
         setTopicCategories(retrievedTopics.category_topics);
@@ -37,7 +33,7 @@ export default function TopicsPage() {
     })();
 
     (async () => {
-      const retrievedCategories = await getCategories("EN");
+      const retrievedCategories = await getCategories("EN", token);
       if (retrievedCategories != null) {
         setCategories(retrievedCategories);
       }
@@ -50,6 +46,7 @@ export default function TopicsPage() {
       categories={categories}
       topicCategories={topicCategories}
       related={related}
+      token={token}
     />
   );
 }

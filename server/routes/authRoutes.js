@@ -1,15 +1,16 @@
 // Import express
-const express = require('express')
+const { Router } = require("express");
 
 // Import books-controller
-const controllers = require('../controllers/authControllers')
+const controllers = require("../controllers/authControllers");
+
+const auth = require("../middlewares/auth");
 
 // Create router
-const router = express.Router()
+const router = Router();
 
-router.post('/login', controllers.login)
-router.post('/logout', controllers.logout)
+router.post("/users/register", auth, controllers.register);
+router.post("/users/login", controllers.login);
+router.delete("/users/logout", auth, controllers.logout);
 
-
-
-module.exports = router
+module.exports = router;

@@ -29,6 +29,7 @@ interface TableTopicsProps {
   categories: Category[];
   topicCategories: TopicCategory[];
   related: Related[];
+  token: string;
 }
 
 export default function TableTopics(props: TableTopicsProps) {
@@ -120,7 +121,8 @@ export default function TableTopics(props: TableTopicsProps) {
       topicId,
       topicTitle,
       selectedCategoriesId,
-      "EN"
+      "EN",
+      props.token
     );
     if (!val) {
       setError(true);
@@ -168,7 +170,8 @@ export default function TableTopics(props: TableTopicsProps) {
       topicTitle,
       "Top Picks Creator",
       selectedCategoriesId,
-      "EN"
+      "EN",
+      props.token
     );
     if (!val) {
       setError(true);
@@ -201,7 +204,7 @@ export default function TableTopics(props: TableTopicsProps) {
   };
 
   const onTopicDelete = async (id: number): Promise<void> => {
-    const val = await deleteTopic(id, "EN");
+    const val = await deleteTopic(id, "EN", props.token);
     if (!val) {
       setError(true);
       setTimeout(() => setError(false), CONSTANTS.ALERT_TIME);

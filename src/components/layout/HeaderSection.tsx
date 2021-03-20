@@ -1,5 +1,5 @@
 import React from "react";
-import { COLORS } from "../constants/Colors";
+import { COLORS } from "../../constants/Colors";
 
 export default function HeaderSection({ title }: { title: string }) {
   return (
