@@ -1,25 +1,30 @@
-import React from "react";
-import { COLORS } from "../constants/Colors";
-import { getCategories } from "../api/api";
-import { useParams } from "react-router-dom";
+import React from 'react';
+import { COLORS } from '../constants/Colors';
+import { getCategories } from '../api/api';
+import { useParams } from 'react-router-dom';
 import {
   Category,
-  ComponentType,
+  PageProps,
   Question,
   Report,
   Topic,
-} from "../interfaces/Interfaces";
-import TableCategories from "../components/tables/TableCategories";
-export default function ViewPage({ token }: ComponentType) {
+} from '../interfaces/Interfaces';
+import TableCategories from '../components/tables/TableCategories';
+export default function ViewPage({ token, currentLanguage }: PageProps) {
   const [categories, setCategories] = React.useState<Category[]>([]);
   React.useEffect(() => {
     (async () => {
-      const retrievedCategories = await getCategories("EN", token);
-      if (retrievedCategories && Array.isArray(retrievedCategories)) {
+      const retrievedCategories = await getCategories(currentLanguage, token);
+      if (retrievedCategories != null) {
         setCategories(retrievedCategories);
       }
     })();
-  }, []);
-
-  return <TableCategories token={token} categories={categories} />;
+  }, [currentLanguage]);
+  return (
+    <TableCategories
+      token={token}
+      categories={categories}
+      currentLanguage={currentLanguage}
+    />
+  );
 }

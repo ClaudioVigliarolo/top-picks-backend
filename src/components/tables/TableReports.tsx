@@ -1,29 +1,30 @@
-import React from "react";
+import React from 'react';
 import {
   CustomTable,
   StyledEditCell,
   StyledTableRow,
   useStyles,
   StyledTableCell,
-} from "./TableStyles";
-import { CONSTANTS } from "../../constants/constants";
-import { Report, ReportHandled, Topic } from "../../interfaces/Interfaces";
-import { deleteQuestion, deleteReport, updateQuestion } from "../../api/api";
-import DeleteDialog from "../dialogs/ConfirmDialog";
-import EditDialog from "../dialogs/EditDialog";
-import Select from "../filters/Select";
-import EditIcon from "@material-ui/icons/Edit";
-import DeleteIcon from "@material-ui/icons/Delete";
-import TransactionAlert from "../alerts/TransactionAlert";
-import SearchBar from "../filters/searchBar";
+} from './TableStyles';
+import { CONSTANTS } from '../../constants/constants';
+import { Report, ReportHandled, Topic } from '../../interfaces/Interfaces';
+import { deleteQuestion, deleteReport, updateQuestion } from '../../api/api';
+import DeleteDialog from '../dialogs/ConfirmDialog';
+import EditDialog from '../dialogs/EditDialog';
+import Select from '../select/Select';
+import EditIcon from '@material-ui/icons/Edit';
+import DeleteIcon from '@material-ui/icons/Delete';
+import TransactionAlert from '../alerts/TransactionAlert';
+import SearchBar from '../input/searchBar';
 
 interface TableReportsProps {
   reports: ReportHandled[];
   topics: Topic[];
   token: string;
+  currentLanguage: string;
 }
 
-const NO_TOPIC = "Filter by topic";
+const NO_TOPIC = 'Filter by topic';
 
 export default function TableCategories(props: TableReportsProps) {
   const [success, setSuccess] = React.useState(false);
@@ -31,10 +32,10 @@ export default function TableCategories(props: TableReportsProps) {
   const [topics, setTopics] = React.useState<Topic[]>([]);
   const [topic, setTopic] = React.useState<string>(NO_TOPIC);
   const [reports, setReports] = React.useState<ReportHandled[]>([]);
-  const [searchText, setSearchText] = React.useState<string>("");
+  const [searchText, setSearchText] = React.useState<string>('');
   const [currentReportId, setCurrentReportId] = React.useState<number>(-1);
   const [currentReportTitle, setCurrentReportTitle] = React.useState<string>(
-    ""
+    ''
   );
   const [editDialog, setEditDialog] = React.useState<boolean>(false);
   const [deleteDialog, setDeleteDialog] = React.useState<boolean>(false);
@@ -60,14 +61,14 @@ export default function TableCategories(props: TableReportsProps) {
     newQuestion: string
   ) => {
     //1 delete report
-    const val1 = await deleteReport(id, "EN", props.token);
+    const val1 = await deleteReport(id, props.currentLanguage, props.token);
 
     //2 update the question with new content
     const val2 = await updateQuestion(
       id,
       newQuestion,
       topicId,
-      "EN",
+      props.currentLanguage,
       props.token
     );
 
@@ -90,15 +91,15 @@ export default function TableCategories(props: TableReportsProps) {
 
   const getTopicTitle = (topicId: number): string => {
     const myTopic = topics.find((topic) => topic.id == topicId);
-    return myTopic ? myTopic.title : "error:topic removed";
+    return myTopic ? myTopic.title : 'error:topic removed';
   };
 
   const onQuestionDelete = async (id: number) => {
     //1 delete report
-    const val1 = await deleteReport(id, "EN", props.token);
+    const val1 = await deleteReport(id, props.currentLanguage, props.token);
 
     //2 delete the question
-    const val2 = await deleteQuestion(id, "EN", props.token);
+    const val2 = await deleteQuestion(id, props.currentLanguage, props.token);
 
     if (!val1 || !val2) {
       setError(true);
@@ -118,7 +119,7 @@ export default function TableCategories(props: TableReportsProps) {
   };
 
   const onReportDelete = async (id: number) => {
-    const val = await deleteReport(id, "EN", props.token);
+    const val = await deleteReport(id, props.currentLanguage, props.token);
 
     if (!val) {
       setError(true);
@@ -153,10 +154,10 @@ export default function TableCategories(props: TableReportsProps) {
   };
 
   const renderRows = (reports: ReportHandled[]) => {
-    return reports.map((report: ReportHandled) => {
+    return reports.map((report: ReportHandled, index: number) => {
       if (report.title.toLowerCase().includes(searchText.toLowerCase())) {
         return (
-          <StyledTableRow>
+          <StyledTableRow key={index}>
             <StyledTableCell>{getTopicTitle(report.topic_id)}</StyledTableCell>
             <StyledTableCell>{report.title}</StyledTableCell>
             <StyledEditCell>
@@ -210,8 +211,8 @@ export default function TableCategories(props: TableReportsProps) {
 
       {reports.length > 0 && (
         <CustomTable
-          columns={["25%", "50%", "25%"]}
-          columnNames={["topic", "question", "reason"]}
+          columns={['25%', '50%', '25%']}
+          columnNames={['topic', 'question', 'reason']}
           body={renderRows(reports)}
         />
       )}
@@ -223,14 +224,14 @@ export default function TableCategories(props: TableReportsProps) {
         onConfirm={() => {
           onQuestionDelete(currentReportId);
           setCurrentReportId(-1);
-          setCurrentReportTitle("");
+          setCurrentReportTitle('');
           setDeleteDialog(false);
         }}
         title="Proceed to Delete the question?"
         description="The question record will be removed from the main database. You cannot undo this operation"
         onRefuse={() => {
           setCurrentReportId(-1);
-          setCurrentReportTitle("");
+          setCurrentReportTitle('');
           setDeleteDialog(false);
         }}
       />
@@ -245,7 +246,7 @@ export default function TableCategories(props: TableReportsProps) {
         title={currentReportTitle}
         onRefuse={() => {
           setCurrentReportId(-1);
-          setCurrentReportTitle("");
+          setCurrentReportTitle('');
           setEditDialog(false);
         }}
       />

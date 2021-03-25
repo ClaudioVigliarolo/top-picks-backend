@@ -1,61 +1,77 @@
-import React from "react";
-import { login } from "../api/api";
-import TransactionAlert from "../components/alerts/TransactionAlert";
-import Form from "../components/input/Form";
-import { CONSTANTS } from "../constants/constants";
-import { AuthContext } from "../context/AuthContext";
-export default function LoginPage() {
+import React from 'react';
+import { login } from '../api/api';
+import TransactionAlert from '../components/alerts/TransactionAlert';
+import { Form, useStyles } from '../components/input/Form';
+import { AuthContext } from '../context/AuthContext';
+import { TextField } from '@material-ui/core';
+import { PageProps } from '../interfaces/Interfaces';
+export default function LoginPage(props: PageProps) {
   const {
     setIsAuthenticated,
     setUserType,
-    setUsername,
-    setUserLangs,
+    setUserLanguages,
     setUserToken,
+    setCurrentLanguage,
     userToken,
+    setEmail,
   } = React.useContext(AuthContext);
 
-  //renamed  setUsername to setUsernameState for context function ovverriding problem
-  const [usernameState, setUsernameState] = React.useState<string>("");
-  const [password, setPassword] = React.useState<string>("");
+  //renamed  setEmail to setEmailState for context function ovverriding problem
+  const [emailState, setEmailState] = React.useState<string>('');
+  const [password, setPassword] = React.useState<string>('');
   const [success, setSuccess] = React.useState<boolean>(false);
   const [error, setError] = React.useState<boolean>(false);
 
+  const classes = useStyles();
+
   const onSubmit = async (): Promise<void> => {
-    setError(false);
-    if (!usernameState || !password) {
+    if (!emailState || !password) {
       setError(true);
-      setTimeout(() => setError(false), CONSTANTS.ALERT_TIME);
       return;
     }
-    const val = await login(usernameState, password);
-    if (val) {
-      alert("ok");
-      console.log("myy", val);
+    const user = await login(emailState, password);
+    if (user) {
+      localStorage.setItem('token', user.token);
+      setUserType(user.type);
+      setEmail(user.username);
+      setEmail(user.email);
+      setUserToken(user.token);
+      setUserLanguages(user.languages);
+      setCurrentLanguage(user.languages[0]);
       setIsAuthenticated(true);
-      setUserType(val.type);
-      setUsername(val.username);
-      setUserToken(val.token);
-      setUserLangs(val.languages);
-      //get enabled languages for user
-      //setUserLangs(val.langs);
     } else {
       setError(true);
     }
-
-    setUsername("");
-    setPassword("");
   };
 
   return (
     <>
       <Form
-        onChangeUsername={(text: string) => setUsernameState(text)}
-        onChangePassword={(text: string) => setPassword(text)}
         onSubmit={onSubmit}
-        password={password}
-        username={usernameState}
         height="40ch"
-        error={error}
+        children={
+          <>
+            <TextField
+              onChange={(e) => setEmailState(e.currentTarget.value)}
+              id="standard-basic"
+              label="Email"
+              type="email"
+              className={classes.textField}
+              value={emailState}
+              error={error}
+            />
+
+            <TextField
+              onChange={(e) => setPassword(e.currentTarget.value)}
+              id="standard-basic"
+              label="Password"
+              type="password"
+              value={password}
+              className={classes.textField}
+              error={error}
+            />
+          </>
+        }
       />
 
       <TransactionAlert

@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from "react";
-import { Redirect, Route, RouteProps } from "react-router-dom";
+import React, { useEffect, useState } from 'react';
+import { Redirect, Route, RouteProps } from 'react-router-dom';
 
 interface CustomRouteProps {
   path: string;
   condition: boolean;
   Component: any;
   token: string;
+  isAuthenticated: boolean;
+  currentLanguage: string;
 }
 
 const CustomRoute = ({
@@ -13,16 +15,22 @@ const CustomRoute = ({
   Component,
   condition,
   token,
+  isAuthenticated,
+  currentLanguage,
 }: CustomRouteProps) => {
   return condition ? (
     <Route
       path={path}
       render={(routeProps) => (
-        <Component navigationProps={routeProps} token={token} />
+        <Component
+          navigationProps={routeProps}
+          token={token}
+          currentLanguage={currentLanguage}
+        />
       )}
     />
   ) : (
-    <Redirect to="/login" />
+    <Redirect to={isAuthenticated ? '/insert/categories' : '/login'} />
   );
 };
 export default CustomRoute;

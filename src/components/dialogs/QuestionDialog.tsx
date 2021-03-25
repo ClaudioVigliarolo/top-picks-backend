@@ -1,6 +1,7 @@
 import React from "react";
 import { CustomDialog } from "./DialogStyles";
-import Select from "../filters/Select";
+import Select from "../select/Select";
+import { TextField } from "@material-ui/core";
 interface QuestionDialogProps {
   topic: string;
   open: boolean;
@@ -44,23 +45,33 @@ export default function QuestionDialog(props: QuestionDialogProps) {
         headerText={props.headerText}
         minWidth={500}
         children={
-          <div style={{ alignSelf: "center" }}>
-            <Select
-              handleChange={handleChange}
-              value={topic}
-              values={topics}
-              color="black"
-              defaultValue={NO_TOPIC}
+          <>
+            <TextField
+              error={error}
+              autoFocus
+              InputLabelProps={{ shrink: true }}
+              margin="dense"
+              label="text"
+              id="standard-helperText"
+              value={question}
+              onChange={(e) => setQuestion(e.currentTarget.value)}
+              fullWidth
             />
-          </div>
+            <div style={{ alignSelf: "center", marginTop: 10 }}>
+              <Select
+                handleChange={handleChange}
+                value={topic}
+                values={topics}
+                color="black"
+                defaultValue={NO_TOPIC}
+              />
+            </div>
+          </>
         }
         onConfirm={() => {
           onSubmit(topic, question);
         }}
         onRefuse={props.onRefuse}
-        error={error}
-        onChange={(text) => setQuestion(text)}
-        text={question}
       />
     </>
   );

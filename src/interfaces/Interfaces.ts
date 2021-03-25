@@ -1,4 +1,4 @@
-import { RouteProps } from "react-router-dom";
+import { RouteProps } from 'react-router-dom';
 
 export interface Topic {
   title: string;
@@ -57,14 +57,22 @@ export interface EditItem {
 }
 
 export interface User {
-  // id: string;
   type: string;
   username: string;
-  token: string;
+  email: string;
   languages: string[];
 }
+export interface LoggedUser extends User {
+  token: string;
+}
 
-export interface ComponentType {
+export interface CreatedUser extends User {
+  id: number;
+  password: string;
+}
+
+export interface PageProps {
   navigationProps: React.ComponentType<RouteProps>;
   token: string;
+  currentLanguage: string;
 }

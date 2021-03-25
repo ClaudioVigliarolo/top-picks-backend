@@ -1,28 +1,28 @@
-import React from "react";
+import React from 'react';
 import {
   CustomTable,
   StyledEditCell,
   StyledTableRow,
   useStyles,
   StyledTableCell,
-} from "./TableStyles";
+} from './TableStyles';
 import {
   Category,
   Topic,
   TopicCategory,
   Related,
-} from "../../interfaces/Interfaces";
-import { CONSTANTS } from "../../constants/constants";
-import { addTopic, deleteTopic, updateTopic } from "../../api/api";
-import DeleteDialog from "../dialogs/ConfirmDialog";
-import TopicAddDialog from "../dialogs/TopicDialog";
-import TopicEditDialog from "../dialogs/TopicDialog";
-import EditIcon from "@material-ui/icons/Edit";
-import DeleteIcon from "@material-ui/icons/Delete";
-import TransactionAlert from "../alerts/TransactionAlert";
-import { getFormattedDate, getHash } from "../../utils/utils";
-import SearchBar from "../filters/searchBar";
-import CustomButton from "../buttons/CustomButton";
+} from '../../interfaces/Interfaces';
+import { CONSTANTS } from '../../constants/constants';
+import { addTopic, deleteTopic, updateTopic } from '../../api/api';
+import DeleteDialog from '../dialogs/ConfirmDialog';
+import TopicAddDialog from '../dialogs/TopicDialog';
+import TopicEditDialog from '../dialogs/TopicDialog';
+import EditIcon from '@material-ui/icons/Edit';
+import DeleteIcon from '@material-ui/icons/Delete';
+import TransactionAlert from '../alerts/TransactionAlert';
+import { getFormattedDate, getHash } from '../../utils/utils';
+import SearchBar from '../input/searchBar';
+import CustomButton from '../buttons/CustomButton';
 
 interface TableTopicsProps {
   topics: Topic[];
@@ -30,6 +30,7 @@ interface TableTopicsProps {
   topicCategories: TopicCategory[];
   related: Related[];
   token: string;
+  currentLanguage: string;
 }
 
 export default function TableTopics(props: TableTopicsProps) {
@@ -42,9 +43,9 @@ export default function TableTopics(props: TableTopicsProps) {
   const [currentTopicRelated, setCurrentTopicRelated] = React.useState<
     string[]
   >([]);
-  const [searchText, setSearchText] = React.useState<string>("");
+  const [searchText, setSearchText] = React.useState<string>('');
   const [topicAddDialog, setTopicAddDialog] = React.useState<boolean>(false);
-  const [currentTopicTitle, setCurrentTopicTitle] = React.useState<string>("");
+  const [currentTopicTitle, setCurrentTopicTitle] = React.useState<string>('');
   const [editDialog, setEditDialog] = React.useState<boolean>(false);
   const [success, setSuccess] = React.useState(false);
   const [error, setError] = React.useState(false);
@@ -72,10 +73,10 @@ export default function TableTopics(props: TableTopicsProps) {
   };
 
   const renderRows = (topics: Topic[]) => {
-    return topics.map((topic: Topic) => {
+    return topics.map((topic: Topic, index: number) => {
       if (topic.title.toLowerCase().includes(searchText.toLowerCase())) {
         return (
-          <StyledTableRow>
+          <StyledTableRow key={index}>
             <StyledTableCell> {topic.title}</StyledTableCell>
             <StyledTableCell>{topic.source}</StyledTableCell>
             <StyledTableCell>
@@ -121,7 +122,7 @@ export default function TableTopics(props: TableTopicsProps) {
       topicId,
       topicTitle,
       selectedCategoriesId,
-      "EN",
+      props.currentLanguage,
       props.token
     );
     if (!val) {
@@ -168,9 +169,9 @@ export default function TableTopics(props: TableTopicsProps) {
     const val = await addTopic(
       topicID,
       topicTitle,
-      "Top Picks Creator",
+      'Top Picks Creator',
       selectedCategoriesId,
-      "EN",
+      props.currentLanguage,
       props.token
     );
     if (!val) {
@@ -185,7 +186,7 @@ export default function TableTopics(props: TableTopicsProps) {
     //update topic array
     newTopics.unshift({
       id: topicID,
-      source: "Top Picks Creator",
+      source: 'Top Picks Creator',
       timestamp: Date(),
       title: topicTitle,
     });
@@ -204,7 +205,7 @@ export default function TableTopics(props: TableTopicsProps) {
   };
 
   const onTopicDelete = async (id: number): Promise<void> => {
-    const val = await deleteTopic(id, "EN", props.token);
+    const val = await deleteTopic(id, props.currentLanguage, props.token);
     if (!val) {
       setError(true);
       setTimeout(() => setError(false), CONSTANTS.ALERT_TIME);
@@ -247,8 +248,8 @@ export default function TableTopics(props: TableTopicsProps) {
         </div>
       </div>
       <CustomTable
-        columns={["15%", "20%", "20%", "45%"]}
-        columnNames={["title", "source", "last update", "related"]}
+        columns={['15%', '20%', '20%', '45%']}
+        columnNames={['title', 'source', 'last update', 'related']}
         body={renderRows(topics)}
       />
 
@@ -260,12 +261,12 @@ export default function TableTopics(props: TableTopicsProps) {
         onConfirm={(topicTitle: string, selectedCategoriesTitle: string[]) => {
           onTopicUpdate(topicTitle, selectedCategoriesTitle, currentTopicId);
           setCurrentTopicId(-1);
-          setCurrentTopicTitle("");
+          setCurrentTopicTitle('');
           setEditDialog(false);
         }}
         onRefuse={() => {
           setCurrentTopicId(-1);
-          setCurrentTopicTitle("");
+          setCurrentTopicTitle('');
           setEditDialog(false);
         }}
         headerText="Edit Topic"

@@ -6,7 +6,7 @@ interface CustomRouteProps {
   isAuthenticated: boolean;
   path: string;
   condition:boolean;
-  component: React.ComponentType;
+  component: React.PageProps;
 }
 
 const CustomRoute = ({

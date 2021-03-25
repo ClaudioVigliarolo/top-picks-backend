@@ -1,26 +1,27 @@
-import React from "react";
+import React from 'react';
 import {
   CustomTable,
   StyledEditCell,
   StyledTableRow,
   useStyles,
-} from "./TableStyles";
-import { CONSTANTS } from "../../constants/constants";
-import { Category } from "../../interfaces/Interfaces";
-import { addCategory, deleteCategory, updateCategory } from "../../api/api";
-import { getHash } from "../../utils/utils";
-import DeleteDialog from "../dialogs/ConfirmDialog";
-import CategoryAddDialog from "../dialogs/CategoryDialog";
-import CategoryEditDialog from "../dialogs/CategoryDialog";
-import CustomButton from "../buttons/CustomButton";
-import SearchBar from "../filters/searchBar";
-import EditIcon from "@material-ui/icons/Edit";
-import DeleteIcon from "@material-ui/icons/Delete";
-import TransactionAlert from "../alerts/TransactionAlert";
+} from './TableStyles';
+import { CONSTANTS } from '../../constants/constants';
+import { Category } from '../../interfaces/Interfaces';
+import { addCategory, deleteCategory, updateCategory } from '../../api/api';
+import { getHash } from '../../utils/utils';
+import DeleteDialog from '../dialogs/ConfirmDialog';
+import CategoryAddDialog from '../dialogs/CategoryDialog';
+import CategoryEditDialog from '../dialogs/CategoryDialog';
+import CustomButton from '../buttons/CustomButton';
+import SearchBar from '../input/searchBar';
+import EditIcon from '@material-ui/icons/Edit';
+import DeleteIcon from '@material-ui/icons/Delete';
+import TransactionAlert from '../alerts/TransactionAlert';
 
 interface TableCategoriesProps {
   categories: Category[];
   token: string;
+  currentLanguage: string;
 }
 
 export default function TableCategories(props: TableCategoriesProps) {
@@ -29,7 +30,7 @@ export default function TableCategories(props: TableCategoriesProps) {
   const [deleteDialog, setDeleteDialog] = React.useState<boolean>(false);
   const [editDialog, setEditDialog] = React.useState<boolean>(false);
   const [categories, setCategories] = React.useState<Category[]>([]);
-  const [searchText, setSearchText] = React.useState<string>("");
+  const [searchText, setSearchText] = React.useState<string>('');
   const [categoryAddDialog, setCategoryAddDialog] = React.useState<boolean>(
     false
   );
@@ -37,7 +38,7 @@ export default function TableCategories(props: TableCategoriesProps) {
   const [
     currentCategoryTitle,
     setCurrentCategoryTitle,
-  ] = React.useState<string>("");
+  ] = React.useState<string>('');
 
   const classes = useStyles();
 
@@ -47,7 +48,12 @@ export default function TableCategories(props: TableCategoriesProps) {
 
   const onCategoryAdd = async (newTitle: string): Promise<void> => {
     const categoryHash = getHash(newTitle);
-    const val = await addCategory(newTitle, categoryHash, "EN", props.token);
+    const val = await addCategory(
+      newTitle,
+      categoryHash,
+      props.currentLanguage,
+      props.token
+    );
     const newCategories = categories;
     if (!val) {
       setError(true);
@@ -62,7 +68,7 @@ export default function TableCategories(props: TableCategoriesProps) {
   };
 
   const onCategoryDelete = async (id: number): Promise<void> => {
-    const val = await deleteCategory(id, "EN", props.token);
+    const val = await deleteCategory(id, props.currentLanguage, props.token);
     if (!val) {
       setError(true);
       setTimeout(() => setError(false), CONSTANTS.ALERT_TIME);
@@ -80,7 +86,12 @@ export default function TableCategories(props: TableCategoriesProps) {
     id: number,
     newTitle: string
   ): Promise<void> => {
-    const val = await updateCategory(newTitle, id, "EN", props.token);
+    const val = await updateCategory(
+      newTitle,
+      id,
+      props.currentLanguage,
+      props.token
+    );
     if (!val) {
       setError(true);
       setTimeout(() => setError(false), CONSTANTS.ALERT_TIME);
@@ -107,10 +118,10 @@ export default function TableCategories(props: TableCategoriesProps) {
   };
 
   const renderRows = (categories: Category[]) => {
-    return categories.map((category: Category) => {
+    return categories.map((category: Category, index: number) => {
       if (category.title.toLowerCase().includes(searchText.toLowerCase())) {
         return (
-          <StyledTableRow>
+          <StyledTableRow key={index}>
             <StyledEditCell>
               {category.title}
               <div className={classes.iconsContainer}>
@@ -150,8 +161,8 @@ export default function TableCategories(props: TableCategoriesProps) {
         </div>
       </div>
       <CustomTable
-        columns={["25%"]}
-        columnNames={["title"]}
+        columns={['50%']}
+        columnNames={['category']}
         body={renderRows(categories)}
       />
 
@@ -174,13 +185,13 @@ export default function TableCategories(props: TableCategoriesProps) {
           onCategoryUpdate(currentCategoryId, newTitle);
           setEditDialog(false);
           setCurrentCategoryId(-1);
-          setCurrentCategoryTitle("");
+          setCurrentCategoryTitle('');
         }}
         headerText="Editing Category"
         onRefuse={() => {
           setEditDialog(false);
           setCurrentCategoryId(-1);
-          setCurrentCategoryTitle("");
+          setCurrentCategoryTitle('');
         }}
         category={currentCategoryTitle}
       />

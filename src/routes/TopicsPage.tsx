@@ -1,6 +1,6 @@
-import React from "react";
-import { getCategories, getTopics } from "../api/api";
-import { useParams } from "react-router-dom";
+import React from 'react';
+import { getCategories, getTopics } from '../api/api';
+import { useParams } from 'react-router-dom';
 import {
   Category,
   TopicCategory,
@@ -9,11 +9,11 @@ import {
   Report,
   RetrievedTopics,
   Topic,
-  ComponentType,
-} from "../interfaces/Interfaces";
-import TableTopics from "../components/tables/TableTopics";
+  PageProps,
+} from '../interfaces/Interfaces';
+import TableTopics from '../components/tables/TableTopics';
 
-export default function TopicsPage({ token }: ComponentType) {
+export default function TopicsPage({ token, currentLanguage }: PageProps) {
   const { lang }: { lang: string } = useParams();
   const [topics, setTopics] = React.useState<Topic[]>([]);
   const [topicCategories, setTopicCategories] = React.useState<TopicCategory[]>(
@@ -24,7 +24,7 @@ export default function TopicsPage({ token }: ComponentType) {
 
   React.useEffect(() => {
     (async () => {
-      const retrievedTopics = await getTopics("EN", token);
+      const retrievedTopics = await getTopics(currentLanguage, token);
       if (retrievedTopics != null) {
         setTopics(retrievedTopics.topics);
         setTopicCategories(retrievedTopics.category_topics);
@@ -33,12 +33,12 @@ export default function TopicsPage({ token }: ComponentType) {
     })();
 
     (async () => {
-      const retrievedCategories = await getCategories("EN", token);
+      const retrievedCategories = await getCategories(currentLanguage, token);
       if (retrievedCategories != null) {
         setCategories(retrievedCategories);
       }
     })();
-  }, []);
+  }, [currentLanguage]);
 
   return (
     <TableTopics
@@ -47,6 +47,7 @@ export default function TopicsPage({ token }: ComponentType) {
       topicCategories={topicCategories}
       related={related}
       token={token}
+      currentLanguage={currentLanguage}
     />
   );
 }

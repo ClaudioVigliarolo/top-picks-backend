@@ -1,25 +1,54 @@
-import React from "react";
+import React from 'react';
+import { getUser } from '../api/api';
 
 export const AuthContext = React.createContext({
   isAuthenticated: false,
   setIsAuthenticated: (newVal: boolean) => {},
   setUserType: (newVal: string) => {},
-  userType: "",
+  userType: '',
   setUsername: (newVal: string) => {},
-  setUserLangs: (newVals: string[]) => {},
+  setEmail: (newVal: string) => {},
+  setUserLanguages: (newVals: string[]) => {},
   setUserToken: (newVal: string) => {},
-  userToken: "",
-  langs: [],
-  username: "",
+  setCurrentLanguage: (newVal: string) => {},
+  userToken: '',
+  username: '',
+  email: '',
+  userLanguages: [''],
+  currentLanguage: '',
 });
 
 export const AuthProvider = ({ children }: { children: any }) => {
   const [isAuthenticated, setIsAuthenticated] = React.useState<boolean>(false);
-  const [userType, setUserType] = React.useState<string>("");
-  const [username, setUsername] = React.useState<string>("");
-  const [userToken, setUserToken] = React.useState<string>("");
+  const [userLanguages, setUserLanguages] = React.useState<string[]>([]);
+  const [currentLanguage, setCurrentLanguage] = React.useState<string>('');
+  const [userType, setUserType] = React.useState<string>('');
+  const [username, setUsername] = React.useState<string>('');
+  const [email, setEmail] = React.useState<string>('');
+  const [userToken, setUserToken] = React.useState<string>('');
 
-  const [userLangs, setUserLangs] = React.useState<string[]>([]);
+  React.useEffect(() => {
+    (async () => {
+      const storedJwt = localStorage.getItem('token');
+      const prevLanguage = localStorage.getItem('language');
+
+      if (storedJwt != null) {
+        const retrievedUser = await getUser(storedJwt);
+        if (retrievedUser) {
+          //the user was already authenticated, set up his data
+          setUserLanguages(retrievedUser.languages);
+          setCurrentLanguage(
+            prevLanguage ? prevLanguage : retrievedUser.languages[0]
+          );
+          setUsername(retrievedUser.username);
+          setEmail(retrievedUser.email);
+          setUserToken(retrievedUser.token);
+          setUserType(retrievedUser.type);
+          setIsAuthenticated(true);
+        }
+      }
+    })();
+  }, []);
 
   const onSetIsAuthenticated = (newVal: boolean) => {
     setIsAuthenticated(newVal);
@@ -33,8 +62,17 @@ export const AuthProvider = ({ children }: { children: any }) => {
     setUsername(newVal);
   };
 
+  const onSetEmail = (newVal: string) => {
+    setEmail(newVal);
+  };
+
+  const onSetCurrentLanguage = (newLang: string) => {
+    localStorage.setItem('language', newLang);
+    setCurrentLanguage(newLang);
+  };
+
   const onSetUserLangs = (newVals: string[]) => {
-    setUserLangs(newVals);
+    setUserLanguages(newVals);
   };
   const onSetUserToken = (newVal: string) => {
     setUserToken(newVal);
@@ -48,11 +86,15 @@ export const AuthProvider = ({ children }: { children: any }) => {
         setUserType: onSetUserType,
         userType,
         setUsername: onSetUserName,
-        setUserLangs: onSetUserLangs,
+        setEmail: onSetEmail,
+        setUserLanguages: onSetUserLangs,
         setUserToken: onSetUserToken,
+        setCurrentLanguage: onSetCurrentLanguage,
         userToken,
-        langs: [],
-        username: "",
+        currentLanguage,
+        username,
+        email,
+        userLanguages,
       }}
     >
       {children}

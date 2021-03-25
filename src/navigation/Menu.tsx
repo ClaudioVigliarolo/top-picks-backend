@@ -1,28 +1,28 @@
-import React from "react";
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
-import Drawer from "@material-ui/core/Drawer";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import AppBar from "@material-ui/core/AppBar";
-import { Link, useLocation } from "react-router-dom";
-import Toolbar from "@material-ui/core/Toolbar";
-import List from "@material-ui/core/List";
-import Typography from "@material-ui/core/Typography";
-import Divider from "@material-ui/core/Divider";
-import ExitToAppIcon from "@material-ui/icons/ExitToApp";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
-import { COLORS } from "../constants/Colors";
-import { MenuItem, Select } from "@material-ui/core";
-
-import HeaderSection from "../components/layout/HeaderSection";
-import { getCondition } from "./Index";
-import { logoutUser } from "../api/api";
+import React from 'react';
+import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
+import Drawer from '@material-ui/core/Drawer';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import AppBar from '@material-ui/core/AppBar';
+import { Link, useLocation } from 'react-router-dom';
+import Toolbar from '@material-ui/core/Toolbar';
+import List from '@material-ui/core/List';
+import Typography from '@material-ui/core/Typography';
+import Divider from '@material-ui/core/Divider';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
+import { COLORS } from '../constants/Colors';
+import { MenuItem, Select } from '@material-ui/core';
+import LanguageSelect from '../components/select/LanguageSelect';
+import HeaderSection from '../components/layout/HeaderSection';
+import { getCondition } from './Index';
+import { logoutUser } from '../api/api';
 const drawerWidth = 240;
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      display: "flex",
+      display: 'flex',
     },
     appBar: {
       width: `calc(100% - ${drawerWidth}px)`,
@@ -34,27 +34,27 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     drawerItem: {
       color: COLORS.menuText,
-      textTransform: "uppercase",
-      fontWeight: "bolder",
-      float: "left",
+      textTransform: 'uppercase',
+      fontWeight: 'bolder',
+      float: 'left',
     },
     childrenContainer: {
       paddingTop: 100,
       backgroundColor: COLORS.primaryBackground,
-      display: "flex",
-      alignItems: "center",
-      flexDirection: "column",
-      minHeight: "100vh",
-      width: "100%",
+      display: 'flex',
+      alignItems: 'center',
+      flexDirection: 'column',
+      minHeight: '100vh',
+      width: '100%',
     },
     paper: {
-      background: "red",
-      color: "red",
+      background: 'red',
+      color: 'red',
     },
     drawerPaper: {
       width: drawerWidth,
       background: COLORS.menuContainer,
-      color: "#fff",
+      color: '#fff',
     },
     // necessary for content to be below app bar
     toolbar: theme.mixins.toolbar,
@@ -63,52 +63,59 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const routers = [
   {
-    key: "login",
-    path: "/login",
-    sidebarName: "login",
-    navbarName: "login",
+    key: 'login',
+    path: '/login',
+    sidebarName: 'login',
+    navbarName: 'login',
   },
 
   {
-    key: "registration",
-    path: "/registration",
-    sidebarName: "registration",
-    navbarName: "registration",
+    key: 'users',
+    path: '/users',
+    sidebarName: 'users',
+    navbarName: 'users',
   },
 
   {
-    key: "register",
-    path: "/register",
-    sidebarName: "register",
-    navbarName: "register",
+    key: 'registration',
+    path: '/registration',
+    sidebarName: 'registration',
+    navbarName: 'registration',
   },
 
   {
-    key: "categories",
-    path: "/insert/categories/:lang",
-    sidebarName: "categories",
-    navbarName: "categories",
+    key: 'register',
+    path: '/register',
+    sidebarName: 'register',
+    navbarName: 'register',
+  },
+
+  {
+    key: 'categories',
+    path: '/insert/categories',
+    sidebarName: 'categories',
+    navbarName: 'categories',
   },
   {
-    key: "topics",
-    path: "/insert/topics/:lang",
-    sidebarName: "topics",
-    navbarName: "topics",
+    key: 'topics',
+    path: '/insert/topics',
+    sidebarName: 'topics',
+    navbarName: 'topics',
   },
   {
-    key: "questions",
-    path: "/insert/questions/:lang",
-    sidebarName: "questions",
-    navbarName: "questions",
+    key: 'questions',
+    path: '/insert/questions',
+    sidebarName: 'questions',
+    navbarName: 'questions',
   },
   {
-    key: "reports",
-    path: "/reports/:lang",
-    sidebarName: "reports",
-    navbarName: "reports",
+    key: 'reports',
+    path: '/reports',
+    sidebarName: 'reports',
+    navbarName: 'reports',
   },
 ];
-const NO_LANG = "Select A Language";
+const NO_LANG = 'Select A Language';
 
 export default function PersistentDrawerLeft({
   children,
@@ -116,20 +123,21 @@ export default function PersistentDrawerLeft({
   isAuthenticated,
   token,
   username,
+  languages,
+  setCurrentLanguage,
+  currentLanguage,
 }: {
-  children: any;
+  children: React.ReactNode;
   userType: string;
   isAuthenticated: boolean;
   token: string;
   username: string;
+  languages: string[];
+  setCurrentLanguage: (newVal: string) => void;
+  currentLanguage: string;
 }) {
   const classes = useStyles();
-  const [path, setPath] = React.useState("");
-  const [language, setLanguage] = React.useState<string>("EN");
-
-  const handleChange = (event: React.ChangeEvent<{ value: string }>) => {
-    setLanguage(event.target.value);
-  };
+  const [path, setPath] = React.useState('');
 
   let location = useLocation();
 
@@ -147,7 +155,7 @@ export default function PersistentDrawerLeft({
 
   const getRouteName = (path: string) => {
     const route = routers.find((route) => route.path == path);
-    return route ? route.navbarName : "Not found";
+    return route ? route.navbarName : 'Not found';
   };
 
   return (
@@ -156,17 +164,18 @@ export default function PersistentDrawerLeft({
       <AppBar
         position="fixed"
         className={classes.appBar}
-        style={{ backgroundColor: "#fff", color: COLORS.primaryOrange }}
+        style={{ backgroundColor: '#fff', color: COLORS.primaryOrange }}
       >
         <Toolbar>
           <Typography variant="h6" noWrap>
             TOP Picks
           </Typography>
-
-          <div style={{ position: "absolute", right: 30 }}>
-            <Typography variant="h6" noWrap>
-              {language}
-            </Typography>
+          <div style={{ position: 'absolute', right: 20, top: 0 }}>
+            <LanguageSelect
+              languages={languages}
+              currentLanguage={currentLanguage}
+              onLanguageChange={setCurrentLanguage}
+            />
           </div>
         </Toolbar>
       </AppBar>
@@ -187,7 +196,7 @@ export default function PersistentDrawerLeft({
               getCondition(userType, prop.path, isAuthenticated) && (
                 <Link
                   to={prop.path}
-                  style={{ textDecoration: "none" }}
+                  style={{ textDecoration: 'none' }}
                   key={key}
                 >
                   <MenuItem selected={activetRoute(prop.path)}>
@@ -209,6 +218,8 @@ export default function PersistentDrawerLeft({
               button
               onClick={() => {
                 logoutUser(token);
+                localStorage.removeItem('token');
+                localStorage.removeItem('language');
                 refreshPage();
               }}
             >

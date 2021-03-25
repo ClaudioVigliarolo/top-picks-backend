@@ -1,7 +1,7 @@
-import React from "react";
-import { Theme, createStyles, makeStyles } from "@material-ui/core/styles";
-import { COLORS } from "../../constants/Colors";
-import CustomAlert from "./CustomAlert";
+import React from 'react';
+import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
+import { COLORS } from '../../constants/Colors';
+import CustomAlert from './CustomAlert';
 
 interface TransactionAlertProps {
   success: boolean;
@@ -13,8 +13,8 @@ interface TransactionAlertProps {
 export default function TransactionAlert({
   success,
   error,
-  messageSuccess = "We encountered an error",
-  messageError = "Successfully executed",
+  messageSuccess = 'Successfully executed',
+  messageError = 'We encountered an error',
 }: TransactionAlertProps) {
   return (
     <>

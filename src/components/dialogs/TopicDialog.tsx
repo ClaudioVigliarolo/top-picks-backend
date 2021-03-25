@@ -1,6 +1,7 @@
 import React from "react";
 import { CustomDialog } from "./DialogStyles";
-import Chip from "../filters/Chip";
+import Chip from "../select/Chip";
+import { TextField } from "@material-ui/core";
 interface TopicDialogProps {
   topic: string;
   open: boolean;
@@ -45,22 +46,32 @@ export default function TopicDialog(props: TopicDialogProps) {
         headerText={props.headerText}
         minWidth={600}
         children={
-          <Chip
-            width={500}
-            selectedValues={selectedCategories}
-            values={categories}
-            header="Topics"
-            error={error}
-            handleChange={handleChange}
-          />
+          <>
+            <TextField
+              error={error}
+              autoFocus
+              InputLabelProps={{ shrink: true }}
+              margin="dense"
+              label="text"
+              id="standard-helperText"
+              value={topic}
+              onChange={(e) => setTopic(e.currentTarget.value)}
+              fullWidth
+            />
+            <Chip
+              width={500}
+              selectedValues={selectedCategories}
+              values={categories}
+              header="Topics"
+              error={error}
+              handleChange={handleChange}
+            />
+          </>
         }
         onConfirm={() => {
           onSubmit(topic, selectedCategories);
         }}
         onRefuse={props.onRefuse}
-        error={error}
-        onChange={(text) => setTopic(text)}
-        text={topic}
       />
     </>
   );

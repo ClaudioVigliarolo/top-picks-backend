@@ -24,11 +24,8 @@ interface TextDialogProps {
   confirmButtonText?: string;
   onRefuse: any;
   refuseButtonText?: string;
-  text: string;
   headerText: string;
-  children?: any;
-  error: boolean;
-  onChange: (text: string) => void;
+  children?: React.ReactNode;
   minWidth: number;
 }
 export const CustomDialog = (props: TextDialogProps) => {
@@ -45,20 +42,19 @@ export const CustomDialog = (props: TextDialogProps) => {
           {props.headerText}
         </DialogTitle>
 
-        <DialogContent style={{ minWidth: props.minWidth }}>
-          <TextField
-            error={props.error}
-            autoFocus
-            InputLabelProps={{ shrink: true }}
-            margin="dense"
-            label="text"
-            id="standard-helperText"
-            value={props.text}
-            onChange={(e) => props.onChange(e.currentTarget.value)}
-            fullWidth
-          />
+        <DialogContent
+          style={{ minWidth: props.minWidth, alignItems: "center" }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              flexDirection: "column",
+            }}
+          >
+            {props.children}
+          </div>
         </DialogContent>
-        {props.children}
         <DialogActions>
           <Button
             onClick={props.onRefuse}

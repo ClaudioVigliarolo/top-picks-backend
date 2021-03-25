@@ -1,24 +1,47 @@
-import axios from "axios";
+import axios from 'axios';
 import {
   Category,
+  CreatedUser,
   Question,
   Report,
   ReportHandled,
   RetrievedTopics,
   Topic,
-  User,
-} from "../interfaces/Interfaces";
-import { HOSTNAME } from "../config/config";
+  LoggedUser,
+} from '../interfaces/Interfaces';
+import { HOSTNAME } from '../config/config';
 
 export const getCategories = async (
   lang: string,
   token: string
 ): Promise<Category[] | null> => {
+  console.log('getc ategoris tiktok', token);
   try {
     let response = await axios
       .get(`${HOSTNAME}/topicks/categories/` + lang, {
         headers: {
-          Authorization: "Bearer " + token,
+          Authorization: 'Bearer ' + token,
+        },
+      })
+      .then((response) => {
+        console.log('MY RES');
+        return response.data;
+      });
+    return response;
+  } catch (err) {
+    console.error(err);
+  }
+  return null;
+};
+
+export const getUsers = async (
+  token: string
+): Promise<CreatedUser[] | null> => {
+  try {
+    let response = await axios
+      .get(`${HOSTNAME}/users/all`, {
+        headers: {
+          Authorization: 'Bearer ' + token,
         },
       })
       .then((response) => {
@@ -39,7 +62,7 @@ export const getTopics = async (
     let response = await axios
       .get(`${HOSTNAME}/topicks/topics/` + lang, {
         headers: {
-          Authorization: "Bearer " + token,
+          Authorization: 'Bearer ' + token,
         },
       })
       .then((response) => {
@@ -72,7 +95,7 @@ export const addTopic = async (
       },
       {
         headers: {
-          Authorization: "Bearer " + token,
+          Authorization: 'Bearer ' + token,
         },
       }
     );
@@ -101,7 +124,7 @@ export const updateTopic = async (
       },
       {
         headers: {
-          Authorization: "Bearer " + token,
+          Authorization: 'Bearer ' + token,
         },
       }
     );
@@ -125,9 +148,112 @@ export const deleteTopic = async (
       },
 
       headers: {
-        Authorization: "Bearer " + token,
+        Authorization: 'Bearer ' + token,
       },
     });
+    return response.status == 200;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+};
+
+export const deleteUser = async (
+  id: number,
+  token: string
+): Promise<boolean> => {
+  try {
+    let response = await axios.delete(`${HOSTNAME}/users/delete`, {
+      data: {
+        id,
+      },
+
+      headers: {
+        Authorization: 'Bearer ' + token,
+      },
+    });
+    return response.status == 201;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+};
+
+//updateCategory
+export const addUser = async (
+  user: CreatedUser,
+  token: string
+): Promise<boolean> => {
+  try {
+    let response = await axios.post(
+      `${HOSTNAME}/users/register`,
+      {
+        user,
+      },
+      {
+        headers: {
+          Authorization: 'Bearer ' + token,
+        },
+      }
+    );
+
+    return response.status == 201;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+};
+
+export const updateUser = async (
+  user: CreatedUser,
+  token: string
+): Promise<boolean> => {
+  try {
+    let response = await axios.put(
+      `${HOSTNAME}/users/update`,
+      {
+        user,
+      },
+      {
+        headers: {
+          Authorization: 'Bearer ' + token,
+        },
+      }
+    );
+    return response.status == 200;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+};
+
+export const emailUser = async (
+  username: string,
+  email: string,
+  password: string,
+  languages: string[],
+  content: string,
+  senderEmail: string,
+  token: string
+): Promise<boolean> => {
+  try {
+    let response = await axios.post(
+      `${HOSTNAME}/users/mail`,
+      {
+        username,
+        email,
+        password,
+        languages,
+        senderEmail,
+        content,
+      },
+      {
+        headers: {
+          Authorization: 'Bearer ' + token,
+        },
+      }
+    );
+
     return response.status == 200;
   } catch (err) {
     console.log(err);
@@ -148,7 +274,7 @@ export const deleteCategory = async (
       },
 
       headers: {
-        Authorization: "Bearer " + token,
+        Authorization: 'Bearer ' + token,
       },
     });
     return response.status == 200;
@@ -172,7 +298,7 @@ export const addQuestions = async (
       },
       {
         headers: {
-          Authorization: "Bearer " + token,
+          Authorization: 'Bearer ' + token,
         },
       }
     );
@@ -183,7 +309,6 @@ export const addQuestions = async (
   }
 };
 
-//updateCategory
 export const addCategory = async (
   title: string,
   id: number,
@@ -200,7 +325,7 @@ export const addCategory = async (
       },
       {
         headers: {
-          Authorization: "Bearer " + token,
+          Authorization: 'Bearer ' + token,
         },
       }
     );
@@ -227,7 +352,7 @@ export const updateCategory = async (
       },
       {
         headers: {
-          Authorization: "Bearer " + token,
+          Authorization: 'Bearer ' + token,
         },
       }
     );
@@ -290,7 +415,7 @@ export const updateQuestion = async (
       },
       {
         headers: {
-          Authorization: "Bearer " + token,
+          Authorization: 'Bearer ' + token,
         },
       }
     );
@@ -313,7 +438,7 @@ export const deleteReport = async (
         lang,
       },
       headers: {
-        Authorization: "Bearer " + token,
+        Authorization: 'Bearer ' + token,
       },
     });
     return response.status == 200;
@@ -335,7 +460,7 @@ export const deleteQuestion = async (
         lang,
       },
       headers: {
-        Authorization: "Bearer " + token,
+        Authorization: 'Bearer ' + token,
       },
     });
     return response.status == 200;
@@ -353,7 +478,7 @@ export const getReports = async (
     let response = await axios
       .get(`${HOSTNAME}/topicks/reports/${lang}`, {
         headers: {
-          Authorization: "Bearer " + token,
+          Authorization: 'Bearer ' + token,
         },
       })
       .then((response) => {
@@ -375,7 +500,7 @@ export const getQuestions = async (
     let response = await axios
       .get(`${HOSTNAME}/topicks/questions/${lang}`, {
         headers: {
-          Authorization: "Bearer " + token,
+          Authorization: 'Bearer ' + token,
         },
       })
       .then((response) => {
@@ -389,13 +514,27 @@ export const getQuestions = async (
 };
 
 export const login = async (
-  username: string,
+  email: string,
   password: string
-): Promise<User | null> => {
+): Promise<LoggedUser | null> => {
   try {
     let response = await axios.post(`${HOSTNAME}/users/login`, {
-      username,
+      email,
       password,
+    });
+    return response.status == 200 ? response.data : null;
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+};
+
+export const getUser = async (token: string): Promise<LoggedUser | null> => {
+  try {
+    let response = await axios.get(`${HOSTNAME}/users/me`, {
+      headers: {
+        Authorization: 'Bearer ' + token,
+      },
     });
     return response.status == 200 ? response.data : null;
   } catch (err) {
@@ -409,7 +548,7 @@ export const logoutUser = async (token: string): Promise<string[] | null> => {
     let response = await axios
       .delete(`${HOSTNAME}/users/logout`, {
         headers: {
-          Authorization: "Bearer " + token,
+          Authorization: 'Bearer ' + token,
         },
         data: {
           token,
@@ -424,34 +563,4 @@ export const logoutUser = async (token: string): Promise<string[] | null> => {
     console.error(err);
   }
   return null;
-};
-
-export const register = async (
-  id: number,
-  username: string,
-  password: string,
-  languages: string[],
-  token: string
-): Promise<boolean> => {
-  try {
-    let response = await axios.post(
-      `${HOSTNAME}/users/register`,
-      {
-        id,
-        username,
-        password,
-        languages,
-      },
-      {
-        headers: {
-          Authorization: "Bearer " + token,
-        },
-      }
-    );
-
-    return response.status == 201;
-  } catch (err) {
-    console.log(err);
-    return false;
-  }
 };

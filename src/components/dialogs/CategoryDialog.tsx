@@ -1,3 +1,4 @@
+import { TextField } from "@material-ui/core";
 import React from "react";
 import { CustomDialog } from "./DialogStyles";
 
@@ -34,9 +35,19 @@ export default function CategoryDialog(props: CategoryDialogProps) {
         minWidth={400}
         onConfirm={() => onSubmit(category)}
         onRefuse={props.onRefuse}
-        error={error}
-        onChange={(text) => setCategory(text)}
-        text={category}
+        children={
+          <TextField
+            error={error}
+            autoFocus
+            InputLabelProps={{ shrink: true }}
+            margin="dense"
+            label="text"
+            id="standard-helperText"
+            value={category}
+            onChange={(e) => setCategory(e.currentTarget.value)}
+            fullWidth
+          />
+        }
       />
     </>
   );

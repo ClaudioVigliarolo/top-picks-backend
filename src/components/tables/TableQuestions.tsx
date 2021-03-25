@@ -1,28 +1,29 @@
-import React from "react";
+import React from 'react';
 import {
   CustomTable,
   StyledEditCell,
   StyledTableCell,
   StyledTableRow,
   useStyles,
-} from "./TableStyles";
-import { CONSTANTS } from "../../constants/constants";
-import { Question, Topic } from "../../interfaces/Interfaces";
-import { addQuestions, deleteQuestion, updateQuestion } from "../../api/api";
-import { getFormattedDate, getHash } from "../../utils/utils";
-import DeleteDialog from "../dialogs/ConfirmDialog";
-import QuestionAddDialog from "../dialogs/QuestionDialog";
-import QuestionEditDialog from "../dialogs/QuestionDialog";
-import CustomButton from "../buttons/CustomButton";
-import SearchBar from "../filters/searchBar";
-import EditIcon from "@material-ui/icons/Edit";
-import DeleteIcon from "@material-ui/icons/Delete";
-import TransactionAlert from "../alerts/TransactionAlert";
+} from './TableStyles';
+import { CONSTANTS } from '../../constants/constants';
+import { Question, Topic } from '../../interfaces/Interfaces';
+import { addQuestions, deleteQuestion, updateQuestion } from '../../api/api';
+import { getFormattedDate, getHash } from '../../utils/utils';
+import DeleteDialog from '../dialogs/ConfirmDialog';
+import QuestionAddDialog from '../dialogs/QuestionDialog';
+import QuestionEditDialog from '../dialogs/QuestionDialog';
+import CustomButton from '../buttons/CustomButton';
+import SearchBar from '../input/searchBar';
+import EditIcon from '@material-ui/icons/Edit';
+import DeleteIcon from '@material-ui/icons/Delete';
+import TransactionAlert from '../alerts/TransactionAlert';
 
 interface TableQuestionsProps {
   questions: Question[];
   topics: Topic[];
   token: string;
+  currentLanguage: string;
 }
 
 export default function TableQuestions(props: TableQuestionsProps) {
@@ -32,7 +33,7 @@ export default function TableQuestions(props: TableQuestionsProps) {
   const [editDialog, setEditDialog] = React.useState<boolean>(false);
   const [questions, setQuestions] = React.useState<Question[]>([]);
   const [topics, setTopics] = React.useState<Topic[]>([]);
-  const [searchText, setSearchText] = React.useState<string>("");
+  const [searchText, setSearchText] = React.useState<string>('');
   const [questionAddDialog, setQuestionAddDialog] = React.useState<boolean>(
     false
   );
@@ -44,7 +45,7 @@ export default function TableQuestions(props: TableQuestionsProps) {
   const [
     currentQuestionTitle,
     setCurrentQuestionTitle,
-  ] = React.useState<string>("");
+  ] = React.useState<string>('');
 
   React.useEffect(() => {
     setQuestions(props.questions);
@@ -56,12 +57,16 @@ export default function TableQuestions(props: TableQuestionsProps) {
     topicId: number
   ): Promise<void> => {
     const newQuestion: Question = {
-      id: getHash(newTitle + "*" + newTitle),
+      id: getHash(newTitle + '*' + newTitle),
       title: newTitle,
       topic_id: topicId,
       timestamp: Date(),
     };
-    const val = await addQuestions([newQuestion], "EN", props.token);
+    const val = await addQuestions(
+      [newQuestion],
+      props.currentLanguage,
+      props.token
+    );
     const newQuestions = questions;
 
     if (!val) {
@@ -77,7 +82,7 @@ export default function TableQuestions(props: TableQuestionsProps) {
   };
 
   const onQuestionDelete = async (id: number): Promise<void> => {
-    const val = await deleteQuestion(id, "EN", props.token);
+    const val = await deleteQuestion(id, props.currentLanguage, props.token);
     if (!val) {
       setError(true);
       setTimeout(() => setError(false), CONSTANTS.ALERT_TIME);
@@ -93,7 +98,13 @@ export default function TableQuestions(props: TableQuestionsProps) {
     newTitle: string,
     topicId: number
   ): Promise<void> => {
-    const val = await updateQuestion(id, newTitle, topicId, "EN", props.token);
+    const val = await updateQuestion(
+      id,
+      newTitle,
+      topicId,
+      props.currentLanguage,
+      props.token
+    );
     if (!val) {
       setError(true);
       setTimeout(() => setError(false), CONSTANTS.ALERT_TIME);
@@ -126,7 +137,7 @@ export default function TableQuestions(props: TableQuestionsProps) {
 
   const getTopicTitle = (topicId: number): string => {
     const myTopic = topics.find((topic) => topic.id == topicId);
-    return myTopic ? myTopic.title : "error:topic removed";
+    return myTopic ? myTopic.title : 'error:topic removed';
   };
 
   const getTopicIdByTitle = (topicTitle: string): number => {
@@ -135,10 +146,10 @@ export default function TableQuestions(props: TableQuestionsProps) {
   };
 
   const renderRows = (questions: Question[]) => {
-    return questions.map((question: Question) => {
+    return questions.map((question: Question, index: number) => {
       if (question.title.toLowerCase().includes(searchText.toLowerCase())) {
         return (
-          <StyledTableRow>
+          <StyledTableRow key={index}>
             <StyledTableCell>
               {getTopicTitle(question.topic_id)}
             </StyledTableCell>
@@ -170,7 +181,7 @@ export default function TableQuestions(props: TableQuestionsProps) {
     });
   };
   {
-    console.log("tt", topics);
+    console.log('tt', topics);
   }
   return (
     <>
@@ -189,8 +200,8 @@ export default function TableQuestions(props: TableQuestionsProps) {
       </div>
 
       <CustomTable
-        columns={["15%", "15%", "70%"]}
-        columnNames={["topic", "last update", "question"]}
+        columns={['15%', '15%', '70%']}
+        columnNames={['topic', 'last update', 'question']}
         body={renderRows(questions)}
       />
       <DeleteDialog
@@ -217,7 +228,7 @@ export default function TableQuestions(props: TableQuestionsProps) {
           );
           setEditDialog(false);
           setCurrentQuestionId(-1);
-          setCurrentQuestionTitle("");
+          setCurrentQuestionTitle('');
           setCurrentTopicId(-1);
         }}
         headerText="Editing Question"
@@ -226,7 +237,7 @@ export default function TableQuestions(props: TableQuestionsProps) {
         onRefuse={() => {
           setEditDialog(false);
           setCurrentQuestionId(-1);
-          setCurrentQuestionTitle("");
+          setCurrentQuestionTitle('');
         }}
       />
 
@@ -240,13 +251,13 @@ export default function TableQuestions(props: TableQuestionsProps) {
           onQuestionAdd(newTitle, getTopicIdByTitle(topicTitle));
           setCurrentQuestionId(-1);
           setCurrentTopicId(-1);
-          setCurrentQuestionTitle("");
+          setCurrentQuestionTitle('');
           setQuestionAddDialog(false);
         }}
         onRefuse={() => {
           setQuestionAddDialog(false);
           setCurrentQuestionId(-1);
-          setCurrentQuestionTitle("");
+          setCurrentQuestionTitle('');
         }}
       />
       <TransactionAlert success={success} error={error} />
