@@ -1,14 +1,14 @@
-import React from "react";
-import Button from "@material-ui/core/Button";
-import Dialog from "@material-ui/core/Dialog";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogContentText from "@material-ui/core/DialogContentText";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import Slide from "@material-ui/core/Slide";
-import { TransitionProps } from "@material-ui/core/transitions";
-import { COLORS } from "../../constants/Colors";
-import { TextField } from "@material-ui/core";
+import React from 'react';
+import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import Slide from '@material-ui/core/Slide';
+import { TransitionProps } from '@material-ui/core/transitions';
+import { COLORS } from '../../constants/colors';
+import { TextField } from '@material-ui/core';
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & { children?: React.ReactElement<any, any> },
@@ -26,7 +26,7 @@ interface EditDialogProps {
   onRefuse: any;
 }
 export default function EditDialog(props: EditDialogProps) {
-  const [title, setTitle] = React.useState<string>("");
+  const [title, setTitle] = React.useState<string>('');
   const [error, setError] = React.useState(false);
 
   React.useEffect(() => {
@@ -35,7 +35,7 @@ export default function EditDialog(props: EditDialogProps) {
 
   const onSubmit = async () => {
     setError(false);
-    if (title == "") {
+    if (title == '') {
       setError(true);
       //set error
       return;

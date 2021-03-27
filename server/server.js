@@ -43,8 +43,6 @@ app.use(function (req, res, next) {
   res.status(404).send('Sorry we could not find that.');
 });
 
-//app.use(history(path.join(__dirname, '..', 'server', 'build', 'index.html')));
-console.log('eeee', process.env);
 // Start express app
 app.listen(PORT, function () {
   console.log(`Server is running on: ${PORT}`);

@@ -7,7 +7,8 @@ import {
   useStyles,
 } from './TableStyles';
 import { CONSTANTS } from '../../constants/constants';
-import { CreatedUser } from '../../interfaces/Interfaces';
+
+import { CreatedUser, EmailType } from '../../interfaces/Interfaces';
 import { addUser, deleteUser, emailUser, updateUser } from '../../api/api';
 import { getHash } from '../../utils/utils';
 import DeleteDialog from '../dialogs/ConfirmDialog';
@@ -74,7 +75,8 @@ export default function TableUsers(props: TableUsersProps) {
       email,
       password,
       languages,
-      'Your account has been created.',
+      EmailType.Registration,
+      'Registration',
       props.email,
       props.token
     );
@@ -101,7 +103,8 @@ export default function TableUsers(props: TableUsersProps) {
       currentUserEmail,
       '',
       currentUserLanguages,
-      'Your account has been removed.',
+      EmailType.Removal,
+      'Account Removal',
       props.email,
       props.token
     );
@@ -142,7 +145,8 @@ export default function TableUsers(props: TableUsersProps) {
       email,
       password,
       languages,
-      'Your password has been changed.',
+      EmailType.Update,
+      'Updated Credentials',
       props.email,
       props.token
     );

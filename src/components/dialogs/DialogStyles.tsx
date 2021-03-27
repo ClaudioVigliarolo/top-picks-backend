@@ -1,15 +1,15 @@
-import React from "react";
-import Button from "@material-ui/core/Button";
-import Dialog from "@material-ui/core/Dialog";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogContentText from "@material-ui/core/DialogContentText";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import Slide from "@material-ui/core/Slide";
-import { TransitionProps } from "@material-ui/core/transitions";
-import { COLORS } from "../../constants/Colors";
-import { TextField } from "@material-ui/core";
-import { Alert } from "@material-ui/lab";
+import React from 'react';
+import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import Slide from '@material-ui/core/Slide';
+import { TransitionProps } from '@material-ui/core/transitions';
+import { COLORS } from '../../constants/colors';
+import { TextField } from '@material-ui/core';
+import { Alert } from '@material-ui/lab';
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & { children?: React.ReactElement<any, any> },
@@ -43,13 +43,13 @@ export const CustomDialog = (props: TextDialogProps) => {
         </DialogTitle>
 
         <DialogContent
-          style={{ minWidth: props.minWidth, alignItems: "center" }}
+          style={{ minWidth: props.minWidth, alignItems: 'center' }}
         >
           <div
             style={{
-              display: "flex",
-              justifyContent: "center",
-              flexDirection: "column",
+              display: 'flex',
+              justifyContent: 'center',
+              flexDirection: 'column',
             }}
           >
             {props.children}
@@ -60,10 +60,10 @@ export const CustomDialog = (props: TextDialogProps) => {
             onClick={props.onRefuse}
             style={{ color: COLORS.darkerOrange }}
           >
-            {props.refuseButtonText ? props.refuseButtonText : "Close"}
+            {props.refuseButtonText ? props.refuseButtonText : 'Close'}
           </Button>
           <Button onClick={props.onConfirm} style={{ color: COLORS.blue }}>
-            {props.confirmButtonText ? props.confirmButtonText : "Submit"}
+            {props.confirmButtonText ? props.confirmButtonText : 'Submit'}
           </Button>
         </DialogActions>
       </Dialog>

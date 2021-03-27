@@ -1,7 +1,7 @@
-import { Button } from "@material-ui/core";
-import { COLORS } from "../../constants/Colors";
+import { Button } from '@material-ui/core';
+import { COLORS } from '../../constants/colors';
 
-import React from "react";
+import React from 'react';
 
 export default function CustomAlert({
   color = COLORS.primaryOrange,
@@ -17,7 +17,7 @@ export default function CustomAlert({
       variant="contained"
       style={{
         backgroundColor: color,
-        color: "white",
+        color: 'white',
       }}
       onClick={onClick}
     >

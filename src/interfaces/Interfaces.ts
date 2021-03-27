@@ -76,3 +76,9 @@ export interface PageProps {
   token: string;
   currentLanguage: string;
 }
+
+export enum EmailType {
+  Registration = 'registration.ejs',
+  Update = 'update.ejs',
+  Removal = 'removal.ejs',
+}

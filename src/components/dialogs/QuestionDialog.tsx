@@ -1,7 +1,7 @@
-import React from "react";
-import { CustomDialog } from "./DialogStyles";
-import Select from "../select/Select";
-import { TextField } from "@material-ui/core";
+import React from 'react';
+import { CustomDialog } from './DialogStyles';
+import Select from '../select/Select';
+import { TextField } from '@material-ui/core';
 interface QuestionDialogProps {
   topic: string;
   open: boolean;
@@ -11,23 +11,25 @@ interface QuestionDialogProps {
   question: string;
   headerText: string;
 }
-const NO_TOPIC = "Select a topic";
+const NO_TOPIC = 'Select a topic';
 
 export default function QuestionDialog(props: QuestionDialogProps) {
-  const [question, setQuestion] = React.useState<string>("");
-  const [topic, setTopic] = React.useState<string>("");
+  const [question, setQuestion] = React.useState<string>('');
+  const [topic, setTopic] = React.useState<string>('');
   const [topics, setTopics] = React.useState<string[]>([]);
   const [error, setError] = React.useState(false);
 
   React.useEffect(() => {
-    setQuestion(props.question);
-    setTopic(props.topic);
-    setTopics(props.topics);
+    if (props.open) {
+      setQuestion(props.question);
+      setTopic(props.topic);
+      setTopics(props.topics);
+    }
   }, [props.topics, props.topic, props.question]);
 
   const onSubmit = async (newTopic: string, newQuestion: string) => {
     setError(false);
-    if (newTopic == "" || newQuestion == "") {
+    if (newTopic == '' || newQuestion == '') {
       setError(true);
       return;
     }
@@ -57,7 +59,7 @@ export default function QuestionDialog(props: QuestionDialogProps) {
               onChange={(e) => setQuestion(e.currentTarget.value)}
               fullWidth
             />
-            <div style={{ alignSelf: "center", marginTop: 10 }}>
+            <div style={{ alignSelf: 'center', marginTop: 10 }}>
               <Select
                 handleChange={handleChange}
                 value={topic}

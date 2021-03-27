@@ -1,6 +1,6 @@
 import React from 'react';
 import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
-import { COLORS } from '../../constants/Colors';
+import { COLORS } from '../../constants/colors';
 import CustomAlert from './CustomAlert';
 
 interface TransactionAlertProps {

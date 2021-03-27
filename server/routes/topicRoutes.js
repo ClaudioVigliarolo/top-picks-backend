@@ -16,7 +16,7 @@ router.get('/updates/:date/:lang', controllers.getUpdates);
 
 router.get('/reports/:lang', auth, controllers.reportsAll);
 
-router.get('/questions/:lang', auth, controllers.questionsAll);
+router.get('/questions/:from/:to/:lang', auth, controllers.questionsAll);
 
 router.post('/add_category', auth, controllers.categoryAdd);
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { COLORS } from '../constants/Colors';
+import { COLORS } from '../constants/colors';
 import { getUsers } from '../api/api';
 import { useParams } from 'react-router-dom';
 import {

@@ -228,19 +228,20 @@ exports.mail = async (req, res) => {
     email,
     password,
     languages,
-    content,
+    template,
     senderEmail,
+    subject,
   } = req.body;
   console.log('email data body', req.body);
-  const locals = { username, email, password, content };
+  const locals = { username, email, password };
   const messageInfo = {
     email,
     fromEmail: senderEmail,
     fromName: 'Top Picks',
-    subject: content,
+    subject,
   };
   mailer
-    .sendOne('default', messageInfo, locals)
+    .sendOne(template, messageInfo, locals)
     .then(() => {
       res.status(200).send();
     })

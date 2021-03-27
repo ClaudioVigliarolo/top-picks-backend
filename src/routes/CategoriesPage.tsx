@@ -1,5 +1,5 @@
 import React from 'react';
-import { COLORS } from '../constants/Colors';
+import { COLORS } from '../constants/colors';
 import { getCategories } from '../api/api';
 import { useParams } from 'react-router-dom';
 import {

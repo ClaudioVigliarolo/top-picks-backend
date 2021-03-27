@@ -114,11 +114,13 @@ exports.topicsAll = (req, res) => {
 };
 
 exports.questionsAll = (req, res) => {
-  const lang = req.params.lang;
+  const { lang, from, to } = req.params;
   knex
     .select('id', 'topic_id', 'title', 'timestamp')
     .from('questions' + lang)
     .orderBy('timestamp', 'desc')
+    .limit(to)
+    .offset(from)
     .then((data) => {
       res.json(data);
     })

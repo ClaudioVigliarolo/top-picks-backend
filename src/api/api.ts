@@ -232,7 +232,8 @@ export const emailUser = async (
   email: string,
   password: string,
   languages: string[],
-  content: string,
+  template: string,
+  subject: string,
   senderEmail: string,
   token: string
 ): Promise<boolean> => {
@@ -245,7 +246,8 @@ export const emailUser = async (
         password,
         languages,
         senderEmail,
-        content,
+        subject,
+        template,
       },
       {
         headers: {
@@ -494,11 +496,13 @@ export const getReports = async (
 
 export const getQuestions = async (
   lang: string,
-  token: string
+  token: string,
+  from: number,
+  to: number
 ): Promise<Question[] | null> => {
   try {
     let response = await axios
-      .get(`${HOSTNAME}/topicks/questions/${lang}`, {
+      .get(`${HOSTNAME}/topicks/questions/${from}/${to}/${lang}`, {
         headers: {
           Authorization: 'Bearer ' + token,
         },

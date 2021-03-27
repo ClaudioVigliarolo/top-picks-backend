@@ -1,5 +1,5 @@
-import React from "react";
-import { MenuItem, Select } from "@material-ui/core";
+import React from 'react';
+import { MenuItem, Select } from '@material-ui/core';
 
 interface CustomSelectProps {
   value: string;
@@ -12,15 +12,16 @@ export default function CustomSelect(props: CustomSelectProps) {
   return (
     <Select
       style={{
-        textTransform: "capitalize",
+        textTransform: 'capitalize',
         width: 200,
         fontSize: 20,
-        color: props.color ? props.color : "#fff",
+        color: props.color ? props.color : '#fff',
       }}
       labelId="demo-simple-select-label"
       id="demo-simple-select"
       value={props.value}
       onChange={props.handleChange}
+      defaultValue=""
     >
       <MenuItem value={props.defaultValue}>{props.defaultValue}</MenuItem>
       {props.values.map((val: string, index: number) => (

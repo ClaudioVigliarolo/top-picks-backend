@@ -26,7 +26,7 @@ exports.sendOne = function (templateName, messageInfo, locals) {
     views: { root: templatesDir, options: { extension: 'ejs' } },
   });
 
-  return Promise.all([email.render(`${templateName}/default`, locals)])
+  return Promise.all([email.render(`${templateName}`, locals)])
     .then(([html, text]) => {
       return sendEmail(messageInfo, text, html);
     })

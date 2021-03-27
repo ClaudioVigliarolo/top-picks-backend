@@ -8,7 +8,12 @@ import {
 } from './TableStyles';
 import { CONSTANTS } from '../../constants/constants';
 import { Question, Topic } from '../../interfaces/Interfaces';
-import { addQuestions, deleteQuestion, updateQuestion } from '../../api/api';
+import {
+  addQuestions,
+  deleteQuestion,
+  getQuestions,
+  updateQuestion,
+} from '../../api/api';
 import { getFormattedDate, getHash } from '../../utils/utils';
 import DeleteDialog from '../dialogs/ConfirmDialog';
 import QuestionAddDialog from '../dialogs/QuestionDialog';
@@ -20,11 +25,13 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import TransactionAlert from '../alerts/TransactionAlert';
 
 interface TableQuestionsProps {
-  questions: Question[];
   topics: Topic[];
   token: string;
   currentLanguage: string;
 }
+
+const SCROLL_THRESHOLD = 200;
+const DIVIDING_FACTOR = 10;
 
 export default function TableQuestions(props: TableQuestionsProps) {
   const [success, setSuccess] = React.useState(false);
@@ -32,7 +39,6 @@ export default function TableQuestions(props: TableQuestionsProps) {
   const [deleteDialog, setDeleteDialog] = React.useState<boolean>(false);
   const [editDialog, setEditDialog] = React.useState<boolean>(false);
   const [questions, setQuestions] = React.useState<Question[]>([]);
-  const [topics, setTopics] = React.useState<Topic[]>([]);
   const [searchText, setSearchText] = React.useState<string>('');
   const [questionAddDialog, setQuestionAddDialog] = React.useState<boolean>(
     false
@@ -40,6 +46,11 @@ export default function TableQuestions(props: TableQuestionsProps) {
   const [currentTopicId, setCurrentTopicId] = React.useState<number>(-1);
 
   const [currentQuestionId, setCurrentQuestionId] = React.useState<number>(-1);
+  const [scrolling, setScrolling] = React.useState(false);
+  const [scrollTop, setScrollTop] = React.useState(0);
+  const [currentScroll, setCurrentScroll] = React.useState(0);
+
+  const [lastScrollUpdate, setLastScrollUpdate] = React.useState(0);
   const classes = useStyles();
 
   const [
@@ -48,9 +59,49 @@ export default function TableQuestions(props: TableQuestionsProps) {
   ] = React.useState<string>('');
 
   React.useEffect(() => {
-    setQuestions(props.questions);
-    setTopics(props.topics);
-  }, [props.questions]);
+    (async () => {
+      //load only first time
+      if (questions.length <= 0) {
+        let retrievedQuestions = await getQuestions(
+          props.currentLanguage,
+          props.token,
+          0,
+          SCROLL_THRESHOLD
+          // lastScrollUpdate,
+          // SCROLL_THRESHOLD
+        );
+        if (retrievedQuestions != null) {
+          setQuestions(retrievedQuestions);
+        }
+      }
+    })();
+  }, []);
+
+  React.useEffect(() => {
+    async function onScroll() {
+      let currentPosition = window.pageYOffset;
+      setCurrentScroll(Math.max(currentPosition, currentScroll));
+
+      if (currentPosition > scrollTop) {
+        setScrollTop(currentPosition <= 0 ? 0 : currentPosition);
+      }
+
+      if (currentPosition > lastScrollUpdate + SCROLL_THRESHOLD) {
+        setLastScrollUpdate(lastScrollUpdate + SCROLL_THRESHOLD);
+        let retrievedQuestions = await getQuestions(
+          props.currentLanguage,
+          props.token,
+          lastScrollUpdate / DIVIDING_FACTOR,
+          SCROLL_THRESHOLD / DIVIDING_FACTOR
+        );
+        if (retrievedQuestions != null) {
+          setQuestions([...questions, ...retrievedQuestions]);
+        }
+      }
+    }
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [scrollTop]);
 
   const onQuestionAdd = async (
     newTitle: string,
@@ -136,12 +187,12 @@ export default function TableQuestions(props: TableQuestionsProps) {
   };
 
   const getTopicTitle = (topicId: number): string => {
-    const myTopic = topics.find((topic) => topic.id == topicId);
+    const myTopic = props.topics.find((topic) => topic.id == topicId);
     return myTopic ? myTopic.title : 'error:topic removed';
   };
 
   const getTopicIdByTitle = (topicTitle: string): number => {
-    const myTopic = topics.find((topic) => topic.title == topicTitle);
+    const myTopic = props.topics.find((topic) => topic.title == topicTitle);
     return myTopic ? myTopic.id : -1;
   };
 
@@ -180,14 +231,11 @@ export default function TableQuestions(props: TableQuestionsProps) {
       }
     });
   };
-  {
-    console.log('tt', topics);
-  }
   return (
     <>
       <div className={classes.headerSection}>
         <SearchBar
-          placeholder="Filter Topics"
+          placeholder="Filter props.topics"
           setSearchText={(text) => setSearchText(text)}
           searchText={searchText}
         />
@@ -219,7 +267,7 @@ export default function TableQuestions(props: TableQuestionsProps) {
 
       <QuestionEditDialog
         open={editDialog}
-        topics={topics.map((t) => t.title)}
+        topics={props.topics.map((t) => t.title)}
         onConfirm={(newTitle: string, topicTitle: string) => {
           onQuestionUpdate(
             currentQuestionId,
@@ -242,7 +290,7 @@ export default function TableQuestions(props: TableQuestionsProps) {
       />
 
       <QuestionAddDialog
-        topics={topics.map((t) => t.title)}
+        topics={props.topics.map((t) => t.title)}
         topic=""
         headerText="Add a new Question"
         question=""

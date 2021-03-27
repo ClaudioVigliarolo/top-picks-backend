@@ -12,7 +12,7 @@ import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import { COLORS } from '../constants/Colors';
+import { COLORS } from '../constants/colors';
 import { MenuItem, Select } from '@material-ui/core';
 import LanguageSelect from '../components/select/LanguageSelect';
 import HeaderSection from '../components/layout/HeaderSection';
